@@ -1,0 +1,45 @@
+-- SimpleJSON.hs
+
+module SimpleJSON(
+	JValue(..),
+	getString,
+	getNumber,
+	getBool,
+	getObject,
+	getArray,
+	isNull) where 
+
+
+
+data JValue = JString String
+	|JNumber Double
+	|JBool Bool
+	|JNull 
+	|JObject [(String, JValue)]
+	|JArray [JValue]
+	deriving (Eq, Ord, Show)
+
+
+
+getString :: JValue -> Maybe String
+getString (JString s) = Just s
+getString _ = Nothing
+
+getNumber :: JValue -> Maybe Double
+getNumber (JNumber n) = Just n
+getNumber _ = Nothing
+
+getBool :: JValue -> Maybe Bool
+getBool (JBool b ) = Just b
+getBool _ = Nothing
+
+--getObject :: JValue -> Maybe JObject
+getObject (JObject o ) = Just o 
+getObject _ = Nothing
+
+--getArray :: JValue -> Maybe JValue
+getArray (JArray a) = Just a
+getArray _ = Nothing
+
+isNull v = v == JNull
+
