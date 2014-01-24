@@ -12,3 +12,4 @@ fib x a b n | n==x = a
 main = do 
 	 args <- getArgs
          putStrLn (show (fibStart (read (head args))))
+
