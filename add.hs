@@ -23,6 +23,9 @@ times2 a = 2*a
 (*+*) :: Double -> Double -> Double
 b *+* a  = (a+b)*(b+a) 
 
+(+++) :: (Double, Double) -> (Double, Double) -> (Double, Double)
+(a, b) +++ (c, d) = (a+c, b+d)
+
 return2 :: a -> a
 return2 b = b
 
@@ -50,4 +53,5 @@ data ThisWorks = ThisWorks OK
 class Test a where
 	test:: a -> String
 
-
+data Maybe a  = Maybe a
+	deriving (Show)
