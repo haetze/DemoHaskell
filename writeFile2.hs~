@@ -17,13 +17,14 @@ main = do
 	input <- getLine
 	fileR <- openFile "comment" ReadMode
 	fileString <-  (hGetContents fileR)
+	let t = fileString `deepseq` ()
+	--putStrLn fileString
 	let str = fileString ++ input ++ "\n" 
-	--putStr  str 
-	fileW <- openFile "comment2" WriteMode
-	hPutStr fileW str 
+	--fileW <- openFile "comment2" WriteMode
+	--hPutStr fileW str 
 	hClose fileR
-	hClose fileW
+	--hClose fileW
 	fileW2 <- openFile "comment" WriteMode
 	hPutStr fileW2 str
 	hClose fileW2
-	removeFile "comment2"
+	--removeFile "comment2"
