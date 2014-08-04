@@ -5,8 +5,8 @@
 {-# LANGUAGE FlexibleInstances #-}
 
 
-add :: Double -> Double -> Double
-add a b = (a)+(b)
+--add :: Double -> Double -> Double
+--add a b = (a)+(b)
 
 sub :: Double -> Double -> Double
 sub a b = (a)-(b)

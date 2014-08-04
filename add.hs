@@ -3,10 +3,10 @@
 
 {-#LANGUAGE TypeSynonymInstances, OverlappingInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE BangPatterns #-}
 
-
-add :: Double -> Double -> Double
-add a b = (a)+(b)
+--add :: Double -> Double -> Double
+--add a b = (a)+(b)
 
 sub :: Double -> Double -> Double
 sub a b = (a)-(b)
@@ -20,7 +20,7 @@ mult a b = (a)*(b)
 times2 :: Double -> Double
 times2 a = 2*a
 
-(*+*) :: Double -> Double -> Double
+(*+*) :: Double -> Double -> DoubleNGUAGE BangPatterns #-}
 b *+* a  = (a+b)*(b+a) 
 
 (+++) :: (Double, Double) -> (Double, Double) -> (Double, Double)
