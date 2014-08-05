@@ -14,13 +14,18 @@ sub a b = (a)-(b)
 dev :: Double -> Double -> Double
 dev a b = (a)/(b)
 
+first :: [a] -> a
+first (x:xs) = x
+first2:: (a, b) -> a
+first2 (a, b) = a
+
 mult :: Double -> Double -> Double
 mult a b = (a)*(b)
 
 times2 :: Double -> Double
 times2 a = 2*a
 
-(*+*) :: Double -> Double -> DoubleNGUAGE BangPatterns #-}
+(*+*) :: Double -> Double -> Double
 b *+* a  = (a+b)*(b+a) 
 
 (+++) :: (Double, Double) -> (Double, Double) -> (Double, Double)
@@ -29,8 +34,21 @@ b *+* a  = (a+b)*(b+a)
 return2 :: a -> a
 return2 b = b
 
+--ownLast:: [a] -> a
+ownLast [] = fail "empty List"  
+ownLast (x:[]) = x
+ownLast (_:xs) = ownLast xs
+
 data Color = Red | Green | Blue
 	deriving (Show, Read , Eq, Ord)
+
+data BookInfo = Book Int String [String]
+	| BookAn Int String 
+	deriving (Show, Read, Eq)
+
+getId :: BookInfo -> Int
+getId (Book id _ _) = id
+getId (BookAn id _) = id
 
 data OK = OK
 	deriving( Read)
@@ -43,6 +61,7 @@ instance Test OK where
 
 instance (Test a ) where
 	test _ = "fuck yourself"
+
 
 --instance Read OK where
 --	read _ = OK

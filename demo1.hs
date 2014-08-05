@@ -8,7 +8,7 @@
 import System.Environment(getArgs)
 import Data.List(sort)
 
-
+biggest :: [Int] -> Int
 biggest xs = last (sort xs)
 
 main = do
