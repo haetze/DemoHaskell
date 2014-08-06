@@ -19,7 +19,7 @@ first (x:xs) = x
 first2:: (a, b) -> a
 first2 (a, b) = a
 
-mult :: Double -> Double -> Double
+mult :: Int -> Int -> Int
 mult a b = (a)*(b)
 
 times2 :: Double -> Double
@@ -34,10 +34,23 @@ b *+* a  = (a+b)*(b+a)
 return2 :: a -> a
 return2 b = b
 
---ownLast:: [a] -> a
-ownLast [] = fail "empty List"  
+ownLast:: [a] -> a
+ownLast [] = error "empty List"  
 ownLast (x:[]) = x
 ownLast (_:xs) = ownLast xs
+
+ownConcat:: [[a]] 	-> [a]
+ownConcat [] 		= []
+ownConcat (x:xs) 	= x ++ ownConcat (xs) 
+
+loop:: Int -> (Int -> Int -> Int) -> [Int] -> Int 
+loop acc func (x:xs) = loop (func acc x) func xs
+loop acc _ [] = acc
+
+--tailss:: [a] -> [[a]]
+tailss [] = []
+tailss (_:xs) = xs : (tailss xs)
+
 
 data Color = Red | Green | Blue
 	deriving (Show, Read , Eq, Ord)
@@ -49,6 +62,18 @@ data BookInfo = Book Int String [String]
 getId :: BookInfo -> Int
 getId (Book id _ _) = id
 getId (BookAn id _) = id
+
+data Book = BookRecord {
+		id2 ::Int,
+		name ::String,
+		add ::[String]
+	}
+	| BookRecordAn{
+		id2 ::Int,
+		add ::[String]
+	}
+	deriving(Show, Read, Eq) 
+
 
 data OK = OK
 	deriving( Read)
@@ -62,6 +87,13 @@ instance Test OK where
 instance (Test a ) where
 	test _ = "fuck yourself"
 
+instance Num [Char] where
+	a + b = a ++ b
+	a - b = a ++ "-" ++ b
+	a * b = ""
+	abs a = a
+	signum a = a
+	fromInteger a = 0  	
 
 --instance Read OK where
 --	read _ = OK
@@ -74,3 +106,35 @@ class Test a where
 
 data Maybe a  = Maybe a
 	deriving (Show)
+
+
+data ObcJ = ObcJ{
+	nameVa ::String,
+	val :: JSVal
+}
+
+data JSVal = 
+	JSString String |
+	JSInt Int |
+	JSDouble Double |
+	JSOb ObcJ |
+	JSOb2 [ObcJ]
+
+
+instance Show ObcJ where
+	show (ObcJ nameVa val)  = "{ " ++ nameVa  ++ " : " ++ show ( val ) ++ "}" 
+
+instance Show JSVal where 
+	show (JSString s) = s
+	show (JSInt i) = show i
+	show (JSDouble d) = show d
+	show (JSOb ob) = show ob
+	show (JSOb2 []) = ""
+	show (JSOb2 (x:[])) = show x 
+	show (JSOb2 c) = show x ++ "," ++ show (JSOb2 xs)
+		where x:xs = c
+
+routOneLevelLast (JSOb2 b)  = xs
+	where _:xs = b
+routOneLevelFirst (JSOb2 b)  = x 
+	where x:_ = b
