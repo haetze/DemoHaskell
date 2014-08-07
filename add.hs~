@@ -108,33 +108,45 @@ data Maybe a  = Maybe a
 	deriving (Show)
 
 
-data ObcJ = ObcJ{
-	nameVa ::String,
-	val :: JSVal
-}
 
 data JSVal = 
 	JSString String |
 	JSInt Int |
 	JSDouble Double |
-	JSOb ObcJ |
-	JSOb2 [ObcJ]
+	JSOb (String, JSVal) |
+	JSArray [JSVal]
 
-
-instance Show ObcJ where
-	show (ObcJ nameVa val)  = "{ " ++ nameVa  ++ " : " ++ show ( val ) ++ "}" 
 
 instance Show JSVal where 
 	show (JSString s) = s
 	show (JSInt i) = show i
 	show (JSDouble d) = show d
 	show (JSOb ob) = show ob
-	show (JSOb2 []) = ""
-	show (JSOb2 (x:[])) = show x 
-	show (JSOb2 c) = show x ++ "," ++ show (JSOb2 xs)
+	show (JSArray []) = ""
+	show (JSArray (x:[])) = show x 
+	show (JSArray c) = show x ++ "," ++ show (JSArray xs)
 		where x:xs = c
 
-routOneLevelLast (JSOb2 b)  = xs
-	where _:xs = b
-routOneLevelFirst (JSOb2 b)  = x 
-	where x:_ = b
+
+mtypeOf:: JSVal -> String
+mtypeOf (JSString s) = "JSString"
+mtypeOf (JSDouble s) = "JSDouble"
+mtypeOf (JSInt s) = "JSInt"
+mtypeOf (JSOb s) = "JSOb"
+mtypeOf (JSArray s) = "JSArray"
+
+
+lookUp:: JSVal -> String -> JSVal 
+lookUp (JSOb (strName, val)) search | strName == search = val
+lookUp (JSOb (strName, _)) search | strName /= search = undefined
+lookUp (JSArray (x:[])) search | mtypeOf x == "JSOb" && a /= search = undefined
+	where JSOb (a,b) = x 
+lookUp (JSArray (x:xs)) search | mtypeOf x == "JSOb" && a /= search = lookUp (JSArray xs) search
+	where JSOb (a,b) = x 
+lookUp (JSArray (x:xs)) search | mtypeOf x == "JSOb" && a == search = b
+	where JSOb (a,b) = x 
+lookUp (JSArray (x:xs)) search | mtypeOf x /= "JSOb" = lookUp (JSArray xs) search
+lookUp _ _ = undefined
+
+ 
+   
