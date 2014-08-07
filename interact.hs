@@ -2,6 +2,8 @@
 -- Save this in a source file, e.g. Interact.hs
 
 import System.Environment (getArgs)
+import Data.Char(toUpper)
+
 
 interactWith function inputFile outputFile = do
   input <- readFile inputFile
@@ -14,6 +16,4 @@ main = mainWith myFunction
             [input,output] -> interactWith function input output
             _ -> putStrLn "error: exactly two arguments needed"
 
-        -- replace "id" with the name of our function below
-        myFunction = id
-{-- /snippet main --}
+        myFunction = map toUpper
