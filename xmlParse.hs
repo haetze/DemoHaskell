@@ -31,3 +31,5 @@ formPath path = do
 _ <> [] = L.pack ""	
 0 <> x = head x
 a <> x = (a-1) <> (tail x)
+
+main = formPath "smsBackup.xml"
