@@ -148,5 +148,4 @@ lookUp (JSArray (x:xs)) search | mtypeOf x == "JSOb" && a == search = b
 lookUp (JSArray (x:xs)) search | mtypeOf x /= "JSOb" = lookUp (JSArray xs) search
 lookUp _ _ = undefined
 
- 
-   
+

@@ -148,5 +148,11 @@ lookUp (JSArray (x:xs)) search | mtypeOf x == "JSOb" && a == search = b
 lookUp (JSArray (x:xs)) search | mtypeOf x /= "JSOb" = lookUp (JSArray xs) search
 lookUp _ _ = undefined
 
- 
-   
+
+data MonadEx = MonadEx String
+
+instance Monad MonadEx where
+  MonadEx a (>>=)  f = f b
+  MonadEx a (>>)  MonadEx b =  MonadEx b
+  return a =  MonadEx a
+  fail a = MonadEx a
