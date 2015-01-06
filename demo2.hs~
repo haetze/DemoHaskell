@@ -9,23 +9,20 @@
 --
 --
 --
-(<<>>) :: Maybe2 Int  -> (Int -> Maybe2 Int)-> Maybe2 Int
-Just2 a <<>> f = if a == 1
-	then f 0
-	else f a
-Nothing2 <<>> _ = Nothing2
-
-data Maybe2 a = Just2 a | Nothing2
-	deriving (Show)
+(<<>>) :: Fractional a => a  -> (a -> a)-> a 
+a <<>> f = f a
 
 
-test ::   Int  -> Maybe2 Int 
-test a = Just2 (a+1)
+test4 :: Num a => a-> a 
+test4 a = a * 12
 
-test2 :: Int -> Maybe2 Int 
-test2 a = Just2 (a+2)
+test ::   Num a => a -> a 
+test a = a+1
 
-test3 :: Int -> Maybe2 Int
+test2 :: Fractional a => a -> a 
+test2 a = a/2
+
+test3 :: Fractional a => a -> a
 test3 a = test a
 	<<>> test2
 
