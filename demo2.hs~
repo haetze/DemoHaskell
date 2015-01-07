@@ -43,14 +43,21 @@ wordCount = print . length . words =<< getLine
 test9:: Int -> Int 
 test9  = test . test . test  
 
-type SimpleState s a = s -> (a, s)
-type StringState a = SimpleState String a 
+data StateString a = State (String, a)
+	deriving(Show, Eq)
 
-returnSt a = \s -> (a, s)
+instance Monad (StateString) where
+	State (a, b) >>= f = f b 
+	return a = State ("", a)
 
-bindSt :: SimpleState s a -> (a -> SimpleState s b) -> SimpleState s b
-bindSt m k = \s -> let (a, s') = m s
-	in (k a) s'
+--data State = (String, Int)
+--f (State (x, z)) = x
+f1 :: StateString Int  -> StateString Int
+f1 (State (a, b)) = inc (State (a, b))
+	>>= dec 
 
-a >>>> b = bindSt a b
+inc :: StateString  Int -> StateString Int 
+inc ( State (a, b)) = State (a, b+1)
 
+dec :: Int  -> StateString Int
+dec b = State ("", b-1)
