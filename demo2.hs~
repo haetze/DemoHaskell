@@ -35,6 +35,22 @@ test8 (x:xs) = return x ++ test5 xs
 test6 :: Num a => a -> [a]
 test6 a = return (a+1)
 
-test7 (x:xs) = test8 (x:xs)
+test7 (x:xs) = test8 (x:xs) 
 	>>= test6
+
+wordCount = print . length . words =<< getLine
+
+test9:: Int -> Int 
+test9  = test . test . test  
+
+type SimpleState s a = s -> (a, s)
+type StringState a = SimpleState String a 
+
+returnSt a = \s -> (a, s)
+
+bindSt :: SimpleState s a -> (a -> SimpleState s b) -> SimpleState s b
+bindSt m k = \s -> let (a, s') = m s
+	in (k a) s'
+
+a >>>> b = bindSt a b
 
