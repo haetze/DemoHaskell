@@ -53,7 +53,7 @@ instance Monad (StateString) where
 --data State = (String, Int)
 --f (State (x, z)) = x
 f1 :: StateString Int  -> StateString Int
-f1 (State (a, b)) = inc (State (a, b))
+f1 (State (a, b)) = inc $  State (a, b)
 	>>= dec 
 
 inc :: StateString  Int -> StateString Int 
@@ -61,3 +61,6 @@ inc ( State (a, b)) = State (a, b+1)
 
 dec :: Int  -> StateString Int
 dec b = State ("", b-1)
+
+add :: Fractional a => a -> a -> a 
+add a b = a+b
