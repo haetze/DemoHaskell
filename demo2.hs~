@@ -9,6 +9,10 @@
 --
 --
 --
+--
+
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 (<<>>) :: Fractional a => a  -> (a -> a)-> a 
 a <<>> f = f a
 
@@ -49,6 +53,15 @@ data StateString a = State (String, a)
 instance Monad (StateString) where
 	State (a, b) >>= f = f b 
 	return a = State ("", a)
+
+incState :: Num a => a -> StateString a
+incState a = return (a+1)
+
+changeState:: StateString a -> String -> StateString a
+changeState (State ("", a) ) s = State (s, a)
+changeState (State (b, a)) s = State (s, a)
+
+
 
 --data State = (String, Int)
 --f (State (x, z)) = x
