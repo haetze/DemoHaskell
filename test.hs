@@ -1,17 +1,38 @@
--- 31.1.2014
--- Richard Stewing 
--- test.hs
+#! /usr/bin/env runhugs +l
 --
-{-#LANGUAGE TypeSynonymInstances, OverlappingInstances #-}
-{-# LANGUAGE FlexibleInstances #-}
+-- test.hs
+-- Copyright (C) 2015 haetze <haetze@localhost>
+--
+-- Distributed under terms of the MIT license.
+--
 
---data Maybe a = Maybe a
+newtype M a = M a
+	deriving (Show, Read)
 
-(==>) :: Bool -> Bool -> Bool
-a ==> f 
-	| a == True  = f
-	| a == False = True
- 
 
-test :: [Double ] -> Bool
-test a = not (null a) ==> False
+f :: Fractional b => b->b 
+f c = c+0.5
+
+g :: Num a => M a -> a
+g (M v) = v
+
+
+h:: Fractional a => M a -> a
+h = f . g 
+
+j:: String -> Int
+j = read
+
+k:: String -> M Int
+k = read
+
+l:: String -> Bool
+l ('M':xs) = True && l xs
+l ('m':xs) = True && l xs
+l []	   = True
+l _ 	   = False
+
+a:: Char -> String -> Bool
+a c (x:xs) | c /= x = True && a c xs
+	   | c == x = True 
+a _ [] 	   = False 
