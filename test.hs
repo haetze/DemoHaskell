@@ -18,7 +18,10 @@ g (M v) = v
 
 
 h:: Fractional a => M a -> a
-h = f . g 
+h a = s . f $ g a
+
+s:: Fractional a => a -> a
+s a = 1+a
 
 j:: String -> Int
 j = read
