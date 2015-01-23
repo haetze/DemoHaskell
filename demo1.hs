@@ -9,12 +9,8 @@ import System.Environment(getArgs)
 import Data.List(sort)
 
 biggest :: [Int] -> Int
-biggest xs = last (sort xs)
+biggest xs = last $ sort xs
 
 main = do
 	args <- getArgs
-	putStrLn (show (biggest (map read args :: [Int])))
-
-
-
-
+	putStrLn . show $ biggest $ map read args 
