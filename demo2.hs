@@ -4,12 +4,6 @@
 -- Copyright (C) 2015 haetze <haetze@ubuntu>
 --
 -- Distributed under terms of the MIT license.
---
---
---
---
---
---
 
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
@@ -61,10 +55,6 @@ changeState:: StateString a -> String -> StateString a
 changeState (State ("", a) ) s = State (s, a)
 changeState (State (b, a)) s = State (s, a)
 
-
-
---data State = (String, Int)
---f (State (x, z)) = x
 f1 :: StateString Int  -> StateString Int
 f1 (State (a, b)) = inc $  State (a, b)
 	>>= dec 
@@ -77,3 +67,19 @@ dec b = State ("", b-1)
 
 add :: Fractional a => a -> a -> a 
 add a b = a+b
+
+words2:: String -> [String]
+words2 s = wordWork [] "" s
+
+
+wordWork:: [String] -> String -> String -> [String]
+wordWork [] s (' ':ys) | s /= "" = wordWork [s] "" ys
+wordWork xs "" (' ':ys) = wordWork xs "" ys
+wordWork [] s (y:ys) | y == ' '=wordWork [] s ys 
+		     | otherwise = wordWork [] (s++[y]) ys
+wordWork (x:xs) s  (' ':ys) = wordWork ((x:xs)++ [s] ) "" ys
+wordWork (x:xs) s (y:ys) = wordWork (x:xs) (s++[y]) ys
+wordWork (x:xs) "" "" = (x:xs)
+wordWork (x:xs) s  "" = (x:xs)++[s]
+
+
