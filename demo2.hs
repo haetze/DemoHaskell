@@ -82,4 +82,10 @@ wordWork (x:xs) s (y:ys) = wordWork (x:xs) (s++[y]) ys
 wordWork (x:xs) "" "" = (x:xs)
 wordWork (x:xs) s  "" = (x:xs)++[s]
 
+pow:: Num a=> a -> Int -> a
+pow a 1 = a
+pow a d = a* (pow a $ d-1)
+
+pow2:: Num a=> a-> Int -> a
+pow2 a b = a^b
 
