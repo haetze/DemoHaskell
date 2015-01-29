@@ -44,6 +44,7 @@ test9  = test . test . test
 data StateString a = State (String, a)
 	deriving(Show, Eq)
 
+
 instance Monad (StateString) where
 	State (a, b) >>= f = f b 
 	return a = State ("", a)
@@ -53,7 +54,7 @@ incState a = return (a+1)
 
 changeState:: StateString a -> String -> StateString a
 changeState (State ("", a) ) s = State (s, a)
-changeState (State (b, a)) s = State (s, a)
+changeState (State (b, a)) s = State (s++b, a)
 
 f1 :: StateString Int  -> StateString Int
 f1 (State (a, b)) = inc $  State (a, b)
@@ -87,5 +88,5 @@ pow a 1 = a
 pow a d = a* (pow a $ d-1)
 
 pow2:: Num a=> a-> Int -> a
-pow a b = a^b
+pow2 a b = a^b
 
