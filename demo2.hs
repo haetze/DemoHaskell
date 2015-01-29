@@ -98,17 +98,21 @@ class Struc a where
 class Double2 a where
 	double:: a -> a
 
-instance Num a => Double2 a where
-	double a = a*a
-
 instance Double2 String where
 	double a = a++a
+
+instance Double2 Int where
+	double a = a*2
+
+instance Double2 Double where
+	double a = a*2
+
 
 instance  Struc a where 
 	get a = [a]
 
---instance Struc Char where
-	--get a = [a]
+st::(Num a, Double2 a)=> a -> a
+st = double
 
 newShow:: Struc a => a -> [a]
 newShow = get
