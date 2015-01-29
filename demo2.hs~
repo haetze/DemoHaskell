@@ -6,6 +6,8 @@
 -- Distributed under terms of the MIT license.
 
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 (<<>>) :: Fractional a => a  -> (a -> a)-> a 
 a <<>> f = f a
@@ -90,3 +92,26 @@ pow a d = a* (pow a $ d-1)
 pow2:: Num a=> a-> Int -> a
 pow2 a b = a^b
 
+class Struc a where
+	get:: a -> [a] 
+
+class Double2 a where
+	double:: a -> a
+
+instance Num a => Double2 a where
+	double a = a*a
+
+instance Double2 String where
+	double a = a++a
+
+instance  Struc a where 
+	get a = [a]
+
+--instance Struc Char where
+	--get a = [a]
+
+newShow:: Struc a => a -> [a]
+newShow = get
+
+first:: [a] -> a
+first (a:as) = a
