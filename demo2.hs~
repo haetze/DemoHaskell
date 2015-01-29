@@ -113,8 +113,8 @@ instance Double2 Double where
 instance  Struc a where 
 	get a = [a]
 
-st::(Num a, Double2 a)=> a -> a
-st = double
+st::(Num a, Struc a)=> a -> [a]
+st = get
 
 newShow:: Struc a => a -> [a]
 newShow = get
