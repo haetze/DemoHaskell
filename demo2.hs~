@@ -121,3 +121,8 @@ newShow = get
 
 first:: [a] -> a
 first (a:as) = a
+
+last2:: [a] -> a
+last2 [] = error  "error" 
+last2 (a:[]) = a
+last2 (a:as) = last as
