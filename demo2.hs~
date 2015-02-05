@@ -126,3 +126,6 @@ last2:: [a] -> a
 last2 [] = error  "error" 
 last2 (a:[]) = a
 last2 (a:as) = last as
+
+--zz:: Num a=> a-> a-> a-> a
+zz a b c = a+b+c
