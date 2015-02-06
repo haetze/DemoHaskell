@@ -135,3 +135,6 @@ sum2 (x:xs) = x+ sum2 xs
 
 charSum:: String -> Int
 charSum s = sum2 $ fmap ord s
+
+zz:: Num a=> a-> a-> a-> a
+zz a b c = a+b+c
