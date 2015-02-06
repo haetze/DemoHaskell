@@ -9,6 +9,8 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
 
+import Data.Char
+
 (<<>>) :: Fractional a => a  -> (a -> a)-> a 
 a <<>> f = f a
 
@@ -126,3 +128,10 @@ last2:: [a] -> a
 last2 [] = error  "error" 
 last2 (a:[]) = a
 last2 (a:as) = last as
+
+sum2::Num a =>  [a] -> a
+sum2 [] = 0
+sum2 (x:xs) = x+ sum2 xs
+
+charSum:: String -> Int
+charSum s = sum2 $ fmap ord s
