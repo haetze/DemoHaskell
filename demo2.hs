@@ -5,8 +5,13 @@
 --
 -- Distributed under terms of the MIT license.
 
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE FlexibleInstances #-}
+
+module Logger(
+	Logger
+	)where
+
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 import Data.Char
@@ -150,3 +155,24 @@ parseBitString:: String -> Int
 parseBitString (x:xs) | isBitString (x:xs) = (read [x] )*(2^ length xs) + parseBitString xs
 parseBitString (x:xs) | not $ isBitString (x:xs) = error "error"
 parseBitString [] 			   = 0
+
+type Log = [String]
+
+--runLogger :: Logger a -> (a, Log)
+
+newtype Logger a =	 Logger { uu :: (a, Log) } 
+	deriving(Show)
+
+instance Monad Logger where
+	return a = Logger (a, [])
+
+	m >>= k = let (a, w) = uu m;
+			n    = k a;
+		      (b, x) = uu n
+		  in Logger (b, w ++ x)
+
+
+
+
+mm ::Show a => a -> Logger String
+mm a = return $ show a 
