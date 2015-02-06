@@ -138,3 +138,15 @@ charSum s = sum2 $ fmap ord s
 
 zz:: Num a=> a-> a-> a-> a
 zz a b c = a+b+c
+
+
+isBitString:: String -> Bool
+isBitString []	     = True
+isBitString ('1':xs) = True && isBitString xs
+isBitString ('0':xs) = True && isBitString xs
+isBitString other = False
+
+parseBitString:: String -> Int
+parseBitString (x:xs) | isBitString (x:xs) = (read [x] )*(2^ length xs) + parseBitString xs
+parseBitString (x:xs) | not $ isBitString (x:xs) = error "error"
+parseBitString [] 			   = 0
