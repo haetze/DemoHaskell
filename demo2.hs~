@@ -6,13 +6,13 @@
 -- Distributed under terms of the MIT license.
 
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 module Logger(
 	Logger
 	)where
 
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE UndecidableInstances #-}
 
 import Data.Char
 
@@ -117,10 +117,10 @@ instance Double2 Double where
 	double a = a*2
 
 
-instance  Struc a where 
+instance Num a => Struc a where 
 	get a = [a]
 
-st::(Num a, Struc a)=> a -> [a]
+st::Struc a=> a -> [a]
 st = get
 
 newShow:: Struc a => a -> [a]
@@ -151,8 +151,13 @@ isBitString ('1':xs) = True && isBitString xs
 isBitString ('0':xs) = True && isBitString xs
 isBitString other = False
 
+toInt:: String -> Int
+toInt ('1':xs) = -1*parseBitString xs
+toInt ('0':xs) = parseBitString xs
+toInt other    = error "errror"
+
 parseBitString:: String -> Int
-parseBitString (x:xs) | isBitString (x:xs) = (read [x] )*(2^ length xs) + parseBitString xs
+parseBitString (x:xs) | isBitString (x:xs) = read [x] *2^ length xs + parseBitString xs
 parseBitString (x:xs) | not $ isBitString (x:xs) = error "error"
 parseBitString [] 			   = 0
 
