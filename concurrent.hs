@@ -24,4 +24,19 @@ incEach::Num a => [a] -> [a]
 incEach [] = []
 incEach (x:xs) = (x+1:incEach xs)
 
+evalList2 ::Strategy a -> Strategy [a]
+evalList2 str [] = return []
+evalList2 str (x:xs) 	= do
+	x' <- str x
+	xs' <- evalList2 str xs
+	return (x':xs')
+
+parList2 :: Strategy a -> Strategy [a]
+parList2 str = evalList2 (rparWith str)
+
+
+--Compute a list of 'same kind' problems in parallel using:
+--solution = map solver [problems] `usingg` parList strategy
+
+
 
