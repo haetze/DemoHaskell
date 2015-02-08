@@ -2,6 +2,12 @@ import Control.Concurrent
 import Control.Parallel
 import Control.Parallel.Strategies
 
+
+main = do
+	let x = m
+	print "done"
+
+
 s f = do
 	i <- forkIO $ f "sss\n"
 	print i
@@ -14,16 +20,8 @@ m = runEval $ do
 	b <- rpar $ incEach [1..100000000000]
 	return (a,b)
 
-main = do
-	let x = m
-	print "done"
-
 incEach::Num a => [a] -> [a]
 incEach [] = []
 incEach (x:xs) = (x+1:incEach xs)
-
-incEachM::Num a => [a] -> Eval [a]
-incEachM a = return (incEach a)
-
 
 
