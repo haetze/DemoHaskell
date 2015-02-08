@@ -1,6 +1,11 @@
+
+
+module Con(
+	)where
 import Control.Concurrent
 import Control.Parallel
 import Control.Parallel.Strategies
+import Logger
 
 
 main = do
@@ -29,7 +34,7 @@ evalList2 str [] = return []
 evalList2 str (x:xs) 	= do
 	x' <- str x
 	xs' <- evalList2 str xs
-	return (x':xs')
+	return (xs'++[x'])
 
 parList2 :: Strategy a -> Strategy [a]
 parList2 str = evalList2 (rparWith str)
