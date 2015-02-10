@@ -1,16 +1,34 @@
 
 
-module Con(
-	)where
+--module Con(
+--	)where
 import Control.Concurrent
 import Control.Parallel
+import System.Environment
 import Control.Parallel.Strategies
 import Logger
+import Control.Monad.Par.Scheds.Trace
 
 
 main = do
-	let x = m
-	print "done"
+	args <- getArgs
+	let [a, b] = map read args
+ 	putStr . show $ 
+		runPar $ do
+		i <- new
+		j <- new
+		fork (put i (fib a))
+		fork (put j (fib b))
+		c <- get i
+		d <- get j
+		return (c, d)
+
+fib:: Int -> Int
+fib 0 = 1
+fib 1 = 1
+fib n = fib (n - 1) + fib (n - 2)
+
+
 
 
 s f = do
@@ -42,6 +60,3 @@ parList2 str = evalList2 (rparWith str)
 
 --Compute a list of 'same kind' problems in parallel using:
 --solution = map solver [problems] `usingg` parList strategy
-
-
-
