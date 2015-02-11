@@ -1,13 +1,11 @@
-
-
---module Con(
---	)where
+--module Con( --	)where 
 import Control.Concurrent
 import Control.Parallel
 import System.Environment
 import Control.Parallel.Strategies
 import Logger
 import Control.Monad.Par.Scheds.Trace
+import System.IO
 
 {-
 main = do
@@ -27,17 +25,17 @@ main = do
 	args <- getArgs
 	let x = map read args
 	let a = map fib2 x `using` parList (rparWith rpar)
-	print a
+	writeFile "sol" . show $ a
 
-fib:: Int -> Int
+fib:: Integer -> Integer
 fib 0 = 1
 fib 1 = 1
 fib n = fib (n - 1) + fib (n - 2)
 
-fib2:: Int -> Int
+fib2:: Integer -> Integer
 fib2 a = fibber 0 1 (a-1)
 
-fibber:: Int -> Int -> Int -> Int
+fibber:: Integer -> Integer -> Integer -> Integer
 fibber a b 0 = a + b
 fibber a b n = fibber b (a+b) (n-1)
 
