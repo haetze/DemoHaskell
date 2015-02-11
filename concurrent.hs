@@ -9,7 +9,7 @@ import Control.Parallel.Strategies
 import Logger
 import Control.Monad.Par.Scheds.Trace
 
-
+{-
 main = do
 	args <- getArgs
 	let [a, b] = map read args
@@ -21,13 +21,25 @@ main = do
 		fork (put j (fib b))
 		c <- get i
 		d <- get j
-		return (c, d)
+		return (c, d)-}
+
+main = do 
+	args <- getArgs
+	let x = map read args
+	let a = map fib2 x `using` parList (rparWith rpar)
+	print a
 
 fib:: Int -> Int
 fib 0 = 1
 fib 1 = 1
 fib n = fib (n - 1) + fib (n - 2)
 
+fib2:: Int -> Int
+fib2 a = fibber 0 1 (a-1)
+
+fibber:: Int -> Int -> Int -> Int
+fibber a b 0 = a + b
+fibber a b n = fibber b (a+b) (n-1)
 
 
 
