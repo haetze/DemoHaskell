@@ -181,3 +181,8 @@ instance Monad Logger where
 
 mm ::Show a => a -> Logger String
 mm a = return $ show a 
+
+fCons:: Num a => [a] -> a -> a
+fCons [] a     = a
+fCons (x:[]) a = x
+fCons (x:xs) a = x* a^(length xs) + fCons xs a
