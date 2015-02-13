@@ -6,6 +6,8 @@ import Control.Parallel.Strategies
 import Logger
 import Control.Monad.Par.Scheds.Trace
 import System.IO
+import Data.Array.Repa as Repa
+import Data.Functor.Identity
 
 {-
 main = do
@@ -19,13 +21,14 @@ main = do
 		fork (put j (fib b))
 		c <- get i
 		d <- get j
-		return (c, d)-}
+		return (c, d) -}
 
 main = do 
 	args <- getArgs
-	let x = map read args
-	let a = map fib2 x `using` parList (rparWith rpar)
+	let x = Prelude.map read args
+	let a = Prelude.map fib2 x `using` parList (rparWith rpar)
 	writeFile "sol" . show $ a
+
 
 fib:: Integer -> Integer
 fib 0 = 1
@@ -62,11 +65,22 @@ evalList2 str [] = return []
 evalList2 str (x:xs) 	= do
 	x' <- str x
 	xs' <- evalList2 str xs
-	return (xs'++[x'])
+	return (xs' Prelude.++ [x'])
 
 parList2 :: Strategy a -> Strategy [a]
 parList2 str = evalList2 (rparWith str)
 
 
 --Compute a list of 'same kind' problems in parallel using:
---solution = map solver [problems] `usingg` parList strategy
+--solution = map solver [problems] `usingg` parList Strategy
+--
+
+
+array::(Int -> Int) -> [Int] -> Array U DIM1 Int
+array  f a = do
+	runIdentity $ do
+		com <- computeP $ fromFunction (Z :. length a) (\(Z :. w) -> f (a !! w)) 
+		return com
+
+
+
