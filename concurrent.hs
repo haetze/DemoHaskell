@@ -76,11 +76,8 @@ parList2 str = evalList2 (rparWith str)
 --
 
 
-array::(Int -> Int) -> [Int] -> Array U DIM1 Int
+array::(Int -> Char) -> [Int] -> Array U DIM1 Char 
 array  f a = do
 	runIdentity $ do
 		com <- computeP $ fromFunction (Z :. length a) (\(Z :. w) -> f (a !! w)) 
 		return com
-
-
-
