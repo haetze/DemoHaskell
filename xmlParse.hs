@@ -1,20 +1,21 @@
 import qualified Data.ByteString.Lazy.Char8 as L
 import Data.Char(isSpace)
 import Control.Parallel.Strategies as P
+import System.IO
 
 parseLine:: [L.ByteString] -> [L.ByteString]
 parseLine x =map findBody x
 
 findBody:: L.ByteString -> L.ByteString
 findBody x = if isSMS x 
-	then  getBody  (L.split '=' x)
+	then  getBody  $ L.split '=' x
 	else L.pack "" 
 
 isSMS:: L.ByteString -> Bool
-isSMS s = L.isPrefixOf (L.pack "<sms") (L.dropWhile isSpace  s)
+isSMS s = L.isPrefixOf (L.pack "<sms") $ L.dropWhile isSpace  s
 
 body:: L.ByteString -> [L.ByteString]
-body x = parseLine ( L.lines x)
+body x = parseLine $ L.lines x
 
 
 getBody:: [L.ByteString] -> L.ByteString
@@ -23,8 +24,8 @@ getBody x = L.pack ""
 
 formPath path = do
 	con <- L.readFile path
-	let s  = map L.unpack (body con)
-	print s
+	let s  = map L.unpack (body con) `using` parList ( rparWith rpar)
+	writeFile "sol" $ concat s
 
 
 (<>) :: Int -> [L.ByteString] -> L.ByteString
