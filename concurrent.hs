@@ -1,4 +1,4 @@
---module Con( --	)where 
+module Con( 	)where 
 import Control.Concurrent
 import Control.Parallel
 import System.Environment
