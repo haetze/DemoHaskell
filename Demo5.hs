@@ -10,6 +10,7 @@ module Demo5 where
 
 
 import Demo4
+import System.Environment
 import Control.Concurrent
 import Control.Concurrent.Chan
 
@@ -26,6 +27,13 @@ calcParCon f1 f2  (c, d)= do
 	
 f:: Chan Integer -> Integer -> IO ()
 f ch a = writeChan ch $ fib2 a
+
+main:: IO ()
+main = do
+	a <- getArgs
+	let [x,y] = map read a
+	calcParCon f f (x,y) >>= print
+	
 
 
 	
