@@ -33,7 +33,15 @@ evaluateLine (O,O,O) = (True, O)
 evaluateLine _	     = (False, NotSet)
 
 evalDown:: Board -> (Bool, Field)
-evalDown (a, b, c) = evaluateBoard ( (element 3 a, element 3 b, element 3 c) , (element 2 a, element 2 b, element 2 c),  (element 1 a, element 1 b, element 1 c))
+evalDown (a, b, c) = evaluateBoardLines ( (element 3 a, element 3 b, element 3 c) , (element 2 a, element 2 b, element 2 c),  (element 1 a, element 1 b, element 1 c))
+
+evaluateBoardLines:: Board -> (Bool, Field)
+evaluateBoardLines (a, b, c) |  (elementP $ evaluateLine a )== True = evaluateLine a  
+	|( elementP $ evaluateLine b )== True = evaluateLine b 
+	|( elementP $ evaluateLine c) == True = evaluateLine c
+	|(elementP $ evaluateCross (a, b, c) )== True = evaluateCross (a, b, c)
+evaluateBoardLines _ = (False, NotSet)
+
 
 evaluateCross:: Board -> (Bool, Field)
 evaluateCross (a, b, c) |  evaluateLine (element 1 a, element 2 b, element 3 c) == (True, X) = evaluateLine (element 1 a, element 2 b, element 3 c) 
@@ -69,4 +77,4 @@ dif _ 		= True
 
 
 a :: Board
-a = ((X,O,O), (X,NotSet,NotSet),(X,NotSet,NotSet))
+a = ((X,O,O), (X,NotSet,NotSet),(NotSet,NotSet,NotSet))
