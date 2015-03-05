@@ -1,6 +1,6 @@
 --Hello World
 --4.1.2014
-
+import System.Environment(getArgs)
 
 type Date = Int
 type Name = [String]
@@ -12,12 +12,10 @@ data Birth = Birth{
 
 
 
-main = let 
-		birth  = Birth{
-			name = ["Richard" ," Stewing"],
-			date = 22041997
-		}	
-		hello  = "Hello Worl1d"
-		(firstName: _ )  = name birth
-	in putStrLn firstName
+main = do
+	a <- getArgs
+	let hello  = "Hello Worl1d"
+	let birth  = Birth a 22041997
+	let (firstName: _) = name birth
+	putStrLn $ show firstName
 
