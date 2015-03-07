@@ -30,7 +30,7 @@ mapCalcValue (x:xs) b = (calcValue x b) + (mapCalcValue xs b)
 
 
 calcDif::(Num a) => MathFunction a -> MathFunction a
-calcDif (Func (x:[])) = Func []
+calcDif (Func (x:[])) = Func [0]
 calcDif (Func (x:xs)) = Func [z] +++ calcDif (Func xs)
 	where 
 		z = mult x $ length xs
@@ -60,10 +60,6 @@ adder (x:xs) (y:[]) | length xs /= 0 = (x+y:xs)
 adder (x:[]) (y:[]) 		     = (x+y:[])
 adder (x:xs) (y:ys) 		     = ((x+y):[]) ++ (adder xs ys)
 
-{-reverse:: [a] -> [a]
-reverse (x:[]) = [x]
-reverse (x:xs) = (reverse xs) ++ [x]-}
-			
 mult::Num a=> a -> Int -> a
 mult x 0 = 0
 mult x a = x + mult x (a-1)
@@ -77,10 +73,11 @@ multTwoList (x:[]) ys = [(map (*x) ys)]
 multTwoList (x:xs) ys = [(map (*x) ys)] ++ multTwoList xs ys
 
 multTwoLFunctions::Num a => MathFunction a -> MathFunction a-> MathFunction a
-multTwoLFunctions (Func xs) (Func ys) = Func ( shrink $ multTwoList xs ys)
+multTwoLFunctions (Func xs) (Func ys) =  shrink $ multTwoList xs ys
 
-shrink::Num a=> [[a]] -> [a]
-shrink (x:xs) = shrink2 1 ((pullTwoTogether  0 x (head xs)) : (tail xs))
+shrink::Num a=> [[a]] -> MathFunction a
+shrink (x:[]) = Func x
+shrink (x:xs) =Func ( shrink2 1 ((pullTwoTogether  0 x (head xs)) : (tail xs)))
 
 shrink2:: Num a=> Int -> [[a]] -> [a]
 shrink2 _ (x:[]) = x
@@ -92,6 +89,9 @@ pullTwoTogether 0 xs ys = ((head xs) : pull (tail xs) ys)
 pullTwoTogether n xs ys = (head xs : (pullTwoTogether (n-1) (tail xs) ys))
 
 pull:: Num a => [a] -> [a] -> [a]
+pull [] ys 	   = ys
+pull xs [] 	   = xs
 pull (x:[]) (y:ys) = (x+y):ys
+pull (x:xs) (y:[]) = (x+y):xs
 pull (x:xs) (y:ys) = ((x+y):pull xs ys)
 
