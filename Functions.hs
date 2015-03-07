@@ -30,3 +30,7 @@ mult x a = x + mult x (a-1)
 
 (+++)::Num a => MathFunction a -> MathFunction a -> MathFunction a
 (Func xs) +++ (Func ys) = Func (xs++ys)
+
+multTwoList::Num a => [a] -> [a] -> [[a]]
+multTwoList (x:[]) ys = [(map (*x) ys)]
+multTwoList (x:xs) ys = [(map (*x) ys)] ++ multTwoList xs ys
