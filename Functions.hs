@@ -9,12 +9,14 @@
 module Functions where
 
 
-newtype MathFunction a = Func [a]
+data MathFunction a = Func [a]
+	| EFunc [a] [a]
 	deriving(Show, Read)
 
 calcValue::MathFunction Double -> Double -> Double
 calcValue (Func (x:[])) _ = x
 calcValue (Func (x:xs)) b = (b^length xs)*x + calcValue (Func xs) b
+calcValue (EFunc xs ys) b = (exp (calcValue (Func xs) b)) * (calcValue (Func ys) b)
 
 
 calcDif::(Num a) => MathFunction a -> MathFunction a
@@ -22,6 +24,22 @@ calcDif (Func (x:[])) = Func []
 calcDif (Func (x:xs)) = Func [z] +++ calcDif (Func xs)
 	where 
 		z = mult x $ length xs
+calcDif (EFunc xs ys) = EFunc xs a
+	where 
+	Func a = (multTwoLFunctions (calcDif (Func xs)) (Func ys)) `add`  (calcDif (Func ys))
+
+add::Num a => MathFunction a-> MathFunction a-> MathFunction a
+add (Func xs) (Func ys) = Func $ reverse (adder (reverse xs) (reverse ys))
+
+adder::Num a=> [a] -> [a] -> [a]
+adder (x:[]) (y:ys) | length ys /= 0 = (x+y:ys)
+adder (x:xs) (y:[]) | length xs /= 0 = (x+y:xs)
+adder (x:[]) (y:[]) 		     = (x+y:[])
+adder (x:xs) (y:ys) 		     = ((x+y):[]) ++ (adder xs ys)
+
+{-reverse:: [a] -> [a]
+reverse (x:[]) = [x]
+reverse (x:xs) = (reverse xs) ++ [x]-}
 			
 mult::Num a=> a -> Int -> a
 mult x 0 = 0
