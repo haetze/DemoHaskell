@@ -6,7 +6,12 @@
 -- Distributed under terms of the MIT license.
 --
 
-module Functions where
+module Functions (
+	MathFunction,
+	calcValue,
+	calcDif,
+	killLeadingZeros)
+	where
 
 
 data MathFunction a = Func [a]
@@ -72,8 +77,19 @@ multTwoList::Num a => [a] -> [a] -> [[a]]
 multTwoList (x:[]) ys = [(map (*x) ys)]
 multTwoList (x:xs) ys = [(map (*x) ys)] ++ multTwoList xs ys
 
+--Just for (Func xs), no more complex calc 
 multTwoLFunctions::Num a => MathFunction a -> MathFunction a-> MathFunction a
 multTwoLFunctions (Func xs) (Func ys) =  shrink $ multTwoList xs ys
+multTwoLFunctions (Func xs) (EFunc ys cs) = EFunc ys a
+	where 
+	Func a = multTwoLFunctions (Func xs) (Func cs)
+multTwoLFunctions (Func xs) (LnFunc ys cs vs) = LnFunc ys a vs
+	where
+	Func a = multTwoLFunctions (Func xs) (Func cs)
+multTwoLFunctions (Func xs) (RatFunc ys cs) = RatFunc a cs
+	where 
+	Func a = multTwoLFunctions (Func xs) (Func ys)
+multTwoLFunctions (Func xs) (Sum ys) = Sum $ map (multTwoLFunctions (Func xs)) ys
 
 shrink::Num a=> [[a]] -> MathFunction a
 shrink (x:[]) = Func x
