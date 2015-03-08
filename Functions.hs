@@ -30,7 +30,7 @@ mapCalcValue (x:xs) b = (calcValue x b) + (mapCalcValue xs b)
 
 
 calcDif::(Num a) => MathFunction a -> MathFunction a
-calcDif (Func (x:[])) = Func [0]
+calcDif (Func (x:[])) = Func []
 calcDif (Func (x:xs)) = Func [z] +++ calcDif (Func xs)
 	where 
 		z = mult x $ length xs
@@ -95,3 +95,20 @@ pull (x:[]) (y:ys) = (x+y):ys
 pull (x:xs) (y:[]) = (x+y):xs
 pull (x:xs) (y:ys) = ((x+y):pull xs ys)
 
+killLeadingZeros::(Eq a, Num a) => MathFunction a -> MathFunction a
+killLeadingZeros (Func (0:xs)) = killLeadingZeros (Func xs)
+killLeadingZeros (Func (x:xs)) = Func (x:xs)
+killLeadingZeros (EFunc xs ys) = EFunc a b
+	where 
+	Func a = killLeadingZeros (Func xs)
+	Func b = killLeadingZeros (Func ys)
+killLeadingZeros (LnFunc xs ys cs) = LnFunc a b c
+	where
+	Func a = killLeadingZeros (Func xs)
+	Func b = killLeadingZeros (Func ys)
+	Func c = killLeadingZeros (Func cs)
+killLeadingZeros (RatFunc xs ys) = RatFunc a b
+	where 
+	Func a = killLeadingZeros (Func xs)
+	Func b = killLeadingZeros (Func ys)
+killLeadingZeros (Sum xs) = Sum $ map killLeadingZeros xs 
