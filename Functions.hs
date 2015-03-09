@@ -5,6 +5,8 @@
 --
 -- Distributed under terms of the MIT license.
 --
+--
+
 
 module Functions (
 	MathFunction,
@@ -12,6 +14,10 @@ module Functions (
 	calcDif,
 	killLeadingZeros)
 	where
+
+
+import Control.Parallel
+import Control.Parallel.Strategies
 
 
 data MathFunction a = Func [a]
@@ -23,7 +29,7 @@ data MathFunction a = Func [a]
 
 calcValue::MathFunction Double -> Double -> Double
 calcValue (Func (x:[])) _ = x
-calcValue (Func (x:xs)) b = (b^length xs)*x + calcValue (Func xs) b
+calcValue (Func (x:xs)) b = sum $ ([(b^length xs)*x] ++ [calcValue (Func xs) b] `using`  parList (rparWith rpar))
 calcValue (EFunc xs ys) b = (exp (calcValue (Func xs) b)) * (calcValue (Func ys) b)
 calcValue (LnFunc xs ys cs) b = (log $ calcValue (Func xs) b) * (calcValue (Func ys) b) / (calcValue (Func cs) b)
 calcValue (RatFunc xs ys) b = (calcValue (Func xs) b) / (calcValue (Func ys) b)
@@ -31,12 +37,12 @@ calcValue (Sum xs)	  b = mapCalcValue xs b
 
 mapCalcValue:: [MathFunction Double] -> Double -> Double
 mapCalcValue (x:[]) b = calcValue x b
-mapCalcValue (x:xs) b = (calcValue x b) + (mapCalcValue xs b)
+mapCalcValue (x:xs) b = sum $  (([(calcValue x b)] ++ [(mapCalcValue xs b)]) `using` parList (rparWith rpar))
 
 
 calcDif::(Num a) => MathFunction a -> MathFunction a
 calcDif (Func (x:[])) = Func []
-calcDif (Func (x:xs)) = Func [z] +++ calcDif (Func xs)
+calcDif (Func (x:xs)) = fold $ ([Func [z]] ++ [calcDif (Func xs)] `using` parList (rparWith rpar))
 	where 
 		z = mult x $ length xs
 calcDif (EFunc xs ys) = EFunc xs a
@@ -69,6 +75,12 @@ mult::Num a=> a -> Int -> a
 mult x 0 = 0
 mult x a = x + mult x (a-1)
 
+fold:: Num a=> [MathFunction a] -> MathFunction a
+fold (x:[]) = x
+fold (x:xs) = fold (s:ss)
+	where 
+	s = x +++ (head xs)
+	ss = tail xs
 
 (+++)::Num a => MathFunction a -> MathFunction a -> MathFunction a
 (Func xs) +++ (Func ys) = Func (xs++ys)
