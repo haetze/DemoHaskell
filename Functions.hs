@@ -140,3 +140,19 @@ killLeadingZeros (RatFunc xs ys) = RatFunc a b
 	Func a = killLeadingZeros (Func xs)
 	Func b = killLeadingZeros (Func ys)
 killLeadingZeros (Sum xs) = Sum $ map killLeadingZeros xs 
+
+
+findX::MathFunction Double -> Double -> Double -> Int -> (Double, Double)
+findX f y x 0 = (x, (calcValue f x) - y)
+findX f y x n | (calcValue f x) == y = (x, 0)
+	      | otherwise 	     = findX f y a (n-1)
+	where
+	 	a = newX f x y
+
+newX:: MathFunction Double -> Double -> Double -> Double
+newX f x y = findXForLinear f2 y
+	where 
+		f2 = Func [ calcValue (calcDif f) x, calcValue f x]
+
+findXForLinear:: MathFunction Double -> Double -> Double 
+findXForLinear (Func (x:xs)) y = (y-(head xs))/x
