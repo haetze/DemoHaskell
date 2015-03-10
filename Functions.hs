@@ -152,7 +152,7 @@ findX f y x n | (calcValue f x) == y = (x, 0)
 newX:: MathFunction Double -> Double -> Double -> Double
 newX f x y = findXForLinear f2 y
 	where 
-		f2 = Func [ calcValue (calcDif f) x, calcValue f x]
+		f2 = Func [ calcValue (calcDif f) x, (calcValue f x) - (calcValue (calcDif f) x)*x]
 
 findXForLinear:: MathFunction Double -> Double -> Double 
 findXForLinear (Func (x:xs)) y = (y-(head xs))/x
