@@ -21,8 +21,10 @@ import Control.Exception
 import Data.Map  as Map
 
 type ClientName = String
+type ChannelName = String
 data Client = Client {
 	name :: ClientName,
+	channel :: ChannelName,
 	handle :: Handle,
 	kicked :: TVar Bool,
 	chan :: TChan Message }
@@ -33,18 +35,24 @@ data Message = Notice String
 	| Command String
 
 data Server = Server {
-	clients :: TVar (Map ClientName Client)}
+	clients :: TVar (Map ClientName Client),
+	clientsInChannel :: TVar (Map ChannelName [Client])}
 
 newServer:: IO Server
 newServer = do
 	c <- newTVarIO Map.empty
-	return Server { clients = c}
+	cs <- newTVarIO Map.empty
+	return Server { clients = c, clientsInChannel = cs}
 
 
-broadcast :: Server -> Message -> STM ()
-broadcast Server{..} mes = do
-	clientMap <- readTVar clients
-	mapM_ (\cl -> sendMessage mes cl) (Map.elems clientMap)
+broadcast :: Server -> Message -> ChannelName -> STM ()
+broadcast Server{..} mes channelName= do
+	clientMap <- readTVar clientsInChannel
+	case (Map.lookup channelName clientMap) of
+	  Nothing -> return ()	
+	  Just clients -> do 
+		let a = Prelude.map (\cl -> sendMessage mes cl) clients
+		return ()
 
 
 
@@ -54,6 +62,7 @@ newClient n h = do
 	c <- newTChan
 	k <- newTVar False
 	return Client { name = n,
+		channel = "default",
 		handle = h,
 		kicked = k,
 		chan = c}
@@ -70,13 +79,13 @@ checkAddClient server@Server{..} name handle = atomically $ do
 	then return Nothing 
 	else do client <- newClient name handle
 		writeTVar clients $ Map.insert name client clientMap
-		broadcast server $ Notice (name ++ " has connected") 
+		broadcast server  (Notice (name ++ " has connected"))  "default"
 		return (Just client)
 
 removeClient:: Server -> ClientName -> IO ()
 removeClient server@Server{..} name = atomically $ do
 	modifyTVar' clients $ Map.delete name 
-	broadcast server $ Notice (name ++ " has diconnected")
+	broadcast server  (Notice (name ++ " has diconnected")) "deault"
 
 
 port:: Int
@@ -154,7 +163,7 @@ handleMessage server client@Client{..} message =
 					hPutStrLn handle $ "not available" 
 					return True
 				_ -> do
-					atomically $ broadcast server $ Broadcast name m
+					atomically $ broadcast server (Broadcast name m) channel
 					return True
 
 	where
