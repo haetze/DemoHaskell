@@ -110,30 +110,83 @@ startClient h  server@Server{..} = do
 	mR <- newRoom
 	me <- atomically $ newClient n h r
 	atomically $ insertRoom server mR r
-	atomically $ insertClientInRoomOnServer r server me 
-	forkFinally (receiveLoopClient me) (\_ -> hClose h)
-	handleMessagesFromClient me server
+	a <- atomically $ insertClientInRoomOnServer r server me 
+	case a of
+	  True -> do
+		forkFinally (receiveLoopClient me) (\_ -> hClose h)
+		handleMessagesFromClient me server
+	  False -> do
+		hPutStrLn h "Name already taken" 
+		return ()
 
-insertClientInRoomOnServer :: String -> Server -> Client -> STM ()
+insertClientInRoomOnServer :: String -> Server -> Client -> STM Bool
 insertClientInRoomOnServer r server@Server{..} client = do
+	roomList <-readTVar rooms 
+	case (Map.lookup r roomList) of 
+	  Nothing -> return False
+	  Just room ->do 
+	    t <- clientInRoom client room
+	    case t of
+	      False -> do 
+		insertClientInRoom client room 
+	      	let a = Map.delete r roomList
+	    	let b = Map.insert r room a 
+	    	writeTVar rooms b
+		return True
+	      True -> return False
+
+
+clientInRoom:: Client -> Room -> STM Bool
+clientInRoom client Room{..} = do
+	cli <- readTVar clients
+	return (Map.member (name client) cli)
+
+clientInRoomOnServer :: Client -> Server -> String -> STM Bool
+clientInRoomOnServer client server@Server{..} n = do
+	r <- readTVar rooms 
+	case (Map.lookup n r) of
+	  Nothing -> return True
+	  Just room -> clientInRoom client room
+
+
+removeClientFromRoomOnServer :: Client -> String -> Server -> STM ()
+removeClientFromRoomOnServer client r server@Server{..} = do
 	roomList <-readTVar rooms 
 	case (Map.lookup r roomList) of 
 	  Nothing -> return ()
 	  Just room ->do 
-	    insertClientInRoom client room 
+	    removeClientFromRoom client room 
 	    let a = Map.delete r roomList
 	    let b = Map.insert r room a 
 	    writeTVar rooms b
+
+
+
 	
 handleMessagesFromClient:: Client -> Server-> IO ()
 handleMessagesFromClient client@Client{..} server@Server{..} = do
+	s <- newTVarIO client
 	m <- atomically $ readTChan chan	
 	case m of
 	  Notice m -> hPutStrLn handl m
-	  Command m ->atomically $ do
-		 sendMessageToRoomOnServer roomName server (Notice (name++":"++m))
-	handleMessagesFromClient client server
+	  Command m -> do
+		case (words m) of
+		  "/changeRoom":to:[] -> atomically $ do
+			a <- clientInRoomOnServer client server to
+			case a of
+		  	  False -> do 
+				removeClientFromRoomOnServer client roomName server
+				insertClientInRoomOnServer to server client
+				writeTVar s (changeRoomInClient client to) 
+			  True -> sendMessageToSelf client 
+		  _ -> atomically $ do
+		 	sendMessageToRoomOnServer roomName server (Notice (name++":"++m))
+	cl <- atomically $ readTVar s
+	handleMessagesFromClient cl server
 
+sendMessageToSelf :: Client -> STM ()
+sendMessageToSelf client@Client{..} = do
+	writeTChan chan (Notice "Name was already taken in this channel; you stayed in your old channel")
 
 sendMessageToRoomOnServer :: String -> Server -> Message -> STM ()
 sendMessageToRoomOnServer roomName server@Server{..} m = do
@@ -142,7 +195,14 @@ sendMessageToRoomOnServer roomName server@Server{..} m = do
 	  Nothing -> return ()
 	  Just r -> broadcast r m
 
-		
+changeRoomInClient :: Client -> String -> Client
+changeRoomInClient client room = Client{
+	chan = (chan client),
+	handl = (handl client),
+	name = (name client),
+	roomName = room}	
+	
+	
 port:: Int
 port = 8080
 
@@ -156,7 +216,3 @@ main = do
      printf "Accepted connection from %s: %s\n" host (show port)
      forkIO $ startClient handle server 
  
-
-	
-
-
