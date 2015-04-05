@@ -1,11 +1,7 @@
 #! /usr/bin/env runhugs +l
 --
 -- Test.hs
-<<<<<<< HEAD
 -- Copyright (C) 2015 haetze <haetze@ubuntu>
-=======
--- Copyright (C) 2015 haetze <haetze@haetze-MacBookAir>
->>>>>>> origin/master
 --
 -- Distributed under terms of the MIT license.
 --
@@ -20,4 +16,3 @@ data Rec a = Rec {
 	valToString :: a -> String
 }
 
->>>>>>> origin/master
