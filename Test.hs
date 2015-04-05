@@ -16,3 +16,21 @@ data Rec a = Rec {
 	valToString :: a -> String
 }
 
+dd :: IO String
+dd = inMonad "hi"
+
+data L a = L String a  
+	deriving(Show, Read)
+
+instance Monad L where
+	return x    = L "" x
+	L _ x >>= f = f x
+	_     >> f  = f
+	--fail s	    = L "" s
+	--
+
+
+test::(Num a, Monad m) => m a -> m a
+test m = m >>= (\a -> return (a+1))
+ 
+
