@@ -33,4 +33,9 @@ instance Monad L where
 test::(Num a, Monad m) => m a -> m a
 test m = m >>= (\a -> return (a+1))
  
-
+lengthBiggerThan :: Int -> [a] -> Bool
+lengthBiggerThan 1 [] = False 
+lengthBiggerThan 1 (_:[]) = False
+lengthBiggerThan n (x:[]) = False 
+lengthBiggerThan 0 (x:_) = True
+lengthBiggerThan n (x:xs) = lengthBiggerThan (n-1) xs
