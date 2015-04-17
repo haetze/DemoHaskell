@@ -27,6 +27,9 @@ createPasswordList = Passwords []
 presentAccount:: SUP -> String
 presentAccount (SUP s u p) = "Account at " ++ s ++ ":" ++ u ++ "->" ++ p ++ "\n"
 
+createPipeString:: SUP -> String
+createPipeString (SUP s u p) = u ++ "\n" ++ p ++ ""
+
 update:: Service -> Username -> PWD -> Passwords -> Passwords
 update s u p pwd = case checkForExistense s u pwd of
 	True -> insert s u p a
