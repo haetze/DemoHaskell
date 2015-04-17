@@ -6,6 +6,7 @@
 -- Distributed under terms of the MIT license.
 --
 
+{-# LANGUAGE BangPatterns #-}
 
 import Data.Maybe
 import System.Environment(getArgs)
@@ -14,23 +15,39 @@ import PasswordMan
 
 main:: IO ()
 main = do
-	appendFile "~/.passwords" ""
-	file <- readFile " ~/.passwords"
-	let pwd = read file
 	args <- getArgs
 	case args of
-		("lookupUserAt":u:s:_) -> putStr . pre $ lookupUserAtService u s pwd
-		("lookupService":s:_) -> shower $ lookupService s pwd
-		("update":s:u:p:_) -> do 
+		("lookupUserAt":s:u:_) ->do
+			 file <- readFile "/home/haetze/passwords" 
+			 let pwd = read file
+			 putStr . pre $ lookupUserAtService u s pwd
+		("lookupService":s:_) ->do 
+			 file <- readFile "/home/haetze/passwords" 
+			 let pwd = read file
+			 shower $ lookupService s pwd
+		("update":s:u:p:_) -> do
+			h <- openFile "/home/haetze/passwords" ReadMode
+			f <- hGetContents h
+			let !pwd = read f 
 			let nP = update s u p pwd 
-			writeFile "~/.passwords" $ show nP
-		("insert":s:u:p:_) -> do
+			hClose h
+			writeToDisk $ show nP
+		("insert":s:u:p:_) -> do 
+			h <- openFile "/home/haetze/passwords" ReadMode
+			f <- hGetContents h
+			let !pwd = read f 
 			let nP = insert s u p pwd 
-			writeFile "~/.passwords" $ show nP
-		("remove":s:u:_) -> do
-			let nP = remove s u pwd
-			writeFile "~/.passwords" $ show nP
-		_ -> putStrLn "unkown Command"
+			hClose h
+			writeToDisk $ show nP
+		("remove":s:u:_) -> do 
+			h <- openFile "/home/haetze/passwords" ReadWriteMode
+			f <- hGetContents h
+			let !pwd = read f 
+			let nP = remove s u pwd 
+			hClose h
+			writeToDisk $ show nP
+		_ -> putStrLn $ "Command: lookupUserAt <User> <Service> \n lookupService <Service> \n " ++
+			"update <Service> <User> <Password> \n insert <Service> <User> <Password> \n remove <Service> <User>"
 
 
 shower:: Maybe [SUP] -> IO ()
@@ -43,3 +60,6 @@ shower (Just (x:xs)) = do
 pre:: Maybe SUP -> String
 pre Nothing = "nothing found" 
 pre (Just s) = presentAccount s
+
+writeToDisk:: String -> IO ()
+writeToDisk s = writeFile "/home/haetze/passwords" s
