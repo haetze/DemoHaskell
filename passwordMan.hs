@@ -25,6 +25,13 @@ main = do
 			 file <- readFile "/home/haetze/passwords" 
 			 let pwd = read file
 			 shower $ lookupService s pwd
+		("pipe":s:u:_) -> do
+			file <- readFile "/home/haetze/passwords"
+			let pwd = read file
+			let ac = lookupUserAtService u s pwd
+			case ac of
+				Nothing -> putStrLn "fail"
+				Just s -> putStr $ createPipeString s
 		("update":s:u:p:_) -> do
 			h <- openFile "/home/haetze/passwords" ReadMode
 			f <- hGetContents h
