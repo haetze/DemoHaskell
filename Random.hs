@@ -11,15 +11,17 @@ module Random where
 
 import System.Random
 
-randomNumber ::Random a => (a, a) ->   IO a
-randomNumber range = do
+randomSymbole ::Random a => (a, a) ->   IO a
+randomSymbole range = do
 	g <- newStdGen
 	let [x] = take 1 $ randomRs range g 
 	return x
 
+randomNumber:: (Random a, Num a, Show a) => (a,a) -> IO a
+randomNumber r = randomSymbole r
 
 
-randomNumbers ::(Random a, Num a) => [a] -> IO [a]
+randomNumbers ::(Random a, Num a, Show a) => [a] -> IO [a]
 randomNumbers [] = return []
 randomNumbers (_:xs) = do 
 	x <- randomNumber (0, 10) 

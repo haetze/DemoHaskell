@@ -38,6 +38,13 @@ main = do
 			!pwd <- createPasswordsFromFileURL "/home/haetze/passwords"
 			let nP = remove s u pwd 
 			writeToDisk $ show nP
+		("createPassword":_) -> do
+			p <- createStandartPassword
+			putStr $ "The password created for you is: " ++ p ++ "\n"
+		("createUser":s:u:_) -> do
+			!p <- createPasswordsFromFileURL "/home/haetze/passwords"
+			nP <- createAccountForService s u p
+			writeToDisk $ show nP 
 		_ -> putStrLn $ "Command: lookupUserAt <User> <Service> \n lookupService <Service> \n " ++
 			"update <Service> <User> <Password> \n insert <Service> <User> <Password> \n remove <Service> <User> \n showAll"
 

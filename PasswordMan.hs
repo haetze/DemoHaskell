@@ -10,7 +10,7 @@ module PasswordMan where
 
 import Data.Maybe
 import System.IO
-
+import Random
 
 type Username = String
 type PWD = String
@@ -22,6 +22,27 @@ data SUP = SUP Service Username PWD
 
 data Passwords = Passwords [SUP]
 	deriving(Show, Read)
+
+createPasswordWithChar:: Int -> IO PWD
+createPasswordWithChar 0 = return ""
+createPasswordWithChar n = do	
+	c <- randomSymbole ('0', 'z')
+	cs <- createPasswordWithChar $ n-1
+	return (c:cs)
+
+createStandartPassword:: IO PWD
+createStandartPassword = createPasswordWithChar 16
+
+createPasswordForService:: Service -> Username -> IO SUP
+createPasswordForService s u = do
+	pwd <- createStandartPassword
+	return $ SUP s u pwd
+
+createAccountForService:: Service -> Username -> Passwords -> IO Passwords
+createAccountForService s u pwd = do 
+	ac <- createPasswordForService s u
+	let nPwd = insertAccount ac pwd
+	return nPwd
 
 createPasswordList:: Passwords
 createPasswordList = Passwords []
@@ -46,6 +67,8 @@ update s u p pwd = case checkForExistense s u pwd of
 	where
 		a = remove s u pwd 
 
+insertAccount:: SUP -> Passwords -> Passwords
+insertAccount (SUP s u p) pwd = insert s u p pwd 
 
 insert:: Service -> Username -> PWD -> Passwords -> Passwords
 insert s u p pwd = case checkForExistense s u pwd of
