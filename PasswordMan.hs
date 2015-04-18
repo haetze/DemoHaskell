@@ -9,11 +9,13 @@
 module PasswordMan where
 
 import Data.Maybe
+import System.IO
 
 
 type Username = String
 type PWD = String
 type Service = String
+type FileURL = String
 
 data SUP = SUP Service Username PWD
 	deriving(Show, Read)
@@ -27,8 +29,15 @@ createPasswordList = Passwords []
 presentAccount:: SUP -> String
 presentAccount (SUP s u p) = "Account at " ++ s ++ ":" ++ u ++ "->" ++ p ++ "\n"
 
-createPipeString:: SUP -> String
-createPipeString (SUP s u p) = u ++ "\n" ++ p ++ ""
+presentAccountsInFile:: Passwords -> String
+presentAccountsInFile (Passwords []) = "\n"
+presentAccountsInFile (Passwords (x:xs)) = presentAccount x ++ presentAccountsInFile (Passwords xs)
+
+createPasswordsFromFileURL:: FileURL -> IO Passwords
+createPasswordsFromFileURL url = do
+	file <- readFile url
+	let pwd = read file
+	return pwd
 
 update:: Service -> Username -> PWD -> Passwords -> Passwords
 update s u p pwd = case checkForExistense s u pwd of

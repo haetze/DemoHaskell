@@ -18,43 +18,28 @@ main = do
 	args <- getArgs
 	case args of
 		("lookupUserAt":s:u:_) ->do
-			 file <- readFile "/home/haetze/passwords" 
-			 let pwd = read file
+			 pwd <- createPasswordsFromFileURL "/home/haetze/passwords"
 			 putStr . pre $ lookupUserAtService u s pwd
 		("lookupService":s:_) ->do 
-			 file <- readFile "/home/haetze/passwords" 
-			 let pwd = read file
+			 pwd <- createPasswordsFromFileURL "/home/haetze/passwords"
 			 shower $ lookupService s pwd
-		("pipe":s:u:_) -> do
-			file <- readFile "/home/haetze/passwords"
-			let pwd = read file
-			let ac = lookupUserAtService u s pwd
-			case ac of
-				Nothing -> putStrLn "fail"
-				Just s -> putStr $ createPipeString s
+		("showAll":_) -> do
+			 pwd <- createPasswordsFromFileURL "/home/haetze/passwords"
+			 putStr $ presentAccountsInFile pwd
 		("update":s:u:p:_) -> do
-			h <- openFile "/home/haetze/passwords" ReadMode
-			f <- hGetContents h
-			let !pwd = read f 
+			!pwd <- createPasswordsFromFileURL "/home/haetze/passwords"
 			let nP = update s u p pwd 
-			hClose h
 			writeToDisk $ show nP
 		("insert":s:u:p:_) -> do 
-			h <- openFile "/home/haetze/passwords" ReadMode
-			f <- hGetContents h
-			let !pwd = read f 
+			!pwd <- createPasswordsFromFileURL "/home/haetze/passwords"
 			let nP = insert s u p pwd 
-			hClose h
 			writeToDisk $ show nP
 		("remove":s:u:_) -> do 
-			h <- openFile "/home/haetze/passwords" ReadWriteMode
-			f <- hGetContents h
-			let !pwd = read f 
+			!pwd <- createPasswordsFromFileURL "/home/haetze/passwords"
 			let nP = remove s u pwd 
-			hClose h
 			writeToDisk $ show nP
 		_ -> putStrLn $ "Command: lookupUserAt <User> <Service> \n lookupService <Service> \n " ++
-			"update <Service> <User> <Password> \n insert <Service> <User> <Password> \n remove <Service> <User>"
+			"update <Service> <User> <Password> \n insert <Service> <User> <Password> \n remove <Service> <User> \n showAll"
 
 
 shower:: Maybe [SUP] -> IO ()
