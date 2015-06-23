@@ -95,8 +95,8 @@ instance Num [Char] where
 	signum a = a
 	fromInteger a = 0  	
 
---instance Read OK where
---	read _ = OK
+instance Read OK where
+	read _ = OK
 
 data ThisWorks = ThisWorks OK 
 	deriving (Show)

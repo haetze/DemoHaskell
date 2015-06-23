@@ -105,9 +105,7 @@ upLooker s (Passwords ((SUP se u p):xs)) | s == se = (SUP se u p) : upLooker s (
 					      | otherwise = upLooker s (Passwords xs)
 
 lookupUserAtService:: Username -> Service -> Passwords -> Maybe SUP
-lookupUserAtService u s pwd = case lookupService s pwd of 
-	Nothing -> Nothing
-	Just xs -> findUser u xs
+lookupUserAtService u s pwd = lookupService s pwd >>= findUser u
 
 findUser:: Username -> [SUP] -> Maybe SUP
 findUser u [] = Nothing
