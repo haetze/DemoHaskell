@@ -4,7 +4,7 @@ import Control.Parallel
 import System.Environment
 import Control.Parallel.Strategies
 import Logger
-import Control.Monad.Par.Scheds.Trace
+--import Control.Monad.Par.Scheds.Trace
 import System.IO
 import Data.Array.Repa as Repa
 import Data.Functor.Identity
