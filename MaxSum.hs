@@ -22,7 +22,7 @@ dropNeg (x:xs) | x < 0 = xs
 
 merge [] = 0
 merge (x:[]) = x
-merge (x:y:xs) | -y < sum (y:xs) = merge (x+y:xs)
+merge (x:y:xs) | -y < sum (y:xs) && x > -y = merge (x+y:xs)
 	       |  x < merge xs 	 = merge xs
 	       | otherwise	 = x
 
