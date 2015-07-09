@@ -11,27 +11,29 @@
 import Data.Maybe
 import System.Environment(getArgs)
 import System.IO
+import System.Directory
 import PasswordMan
 
 main:: IO ()
 main = do
+	home <- getHomeDirectory
 	args <- getArgs
 	case args of
 		("lookupUserAt":s:u:_) ->do
-			 pwd <- createPasswordsFromFileURL "/home/haetze/passwords"
+			 pwd <- createPasswordsFromFileURL home ++"/passwords"
 			 putStr . pre $ lookupUserAtService u s pwd
 		("lookupService":s:_) ->do 
-			 pwd <- createPasswordsFromFileURL "/home/haetze/passwords"
+			 pwd <- createPasswordsFromFileURL home++ "/passwords"
 			 shower $ lookupService s pwd
 		("showAll":_) -> do
-			 pwd <- createPasswordsFromFileURL "/home/haetze/passwords"
-			 putStr $ presentAccountsInFile pwd
+			!pwd <- createPasswordsFromFileURL home++"/passwords"
+			putStr $ presentAccountsInFile pwd
 		("update":s:u:p:_) -> do
-			!pwd <- createPasswordsFromFileURL "/home/haetze/passwords"
+			!pwd <- createPasswordsFromFileURL home++"/passwords"
 			let nP = update s u p pwd 
 			writeToDisk $ show nP
 		("insert":s:u:p:_) -> do 
-			!pwd <- createPasswordsFromFileURL "/home/haetze/passwords"
+			!pwd <- createPasswordsFromFileURL home++"/passwords"
 			let nP = insert s u p pwd 
 			writeToDisk $ show nP
 		("remove":s:u:_) -> do 
@@ -42,8 +44,8 @@ main = do
 			p <- createStandartPassword
 			putStr $ "The password created for you is: " ++ p ++ "\n"
 		("createUser":s:u:_) -> do
-			!p <- createPasswordsFromFileURL "/home/haetze/passwords"
-			nP <- createAccountForService s u p
+			!pwd <- createPasswordsFromFileURL home++"/passwords"
+			nP <- createAccountForService s u pwd
 			writeToDisk $ show nP 
 		_ -> putStrLn $ "Command: lookupUserAt <User> <Service> \n lookupService <Service> \n " ++
 			"update <Service> <User> <Password> \n insert <Service> <User> <Password> \n remove <Service> <User> \n showAll"
