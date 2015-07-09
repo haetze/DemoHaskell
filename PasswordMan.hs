@@ -30,9 +30,9 @@ createPasswordWithChar n = do
 	cs <- createPasswordWithChar $ n-1
 	return (c:cs)
 
-createPasswordsFile:: FilePath -> IO ()
-createPasswordsFile home = do
-	f <- openFile (home ++ "/passwords") WriteMode
+createPasswordsFile:: FilePath -> String -> IO ()
+createPasswordsFile home file= do
+	f <- openFile (home ++ file) WriteMode
 	hPutStr f "Passwords []"
 	hClose f
 

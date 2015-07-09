@@ -21,31 +21,31 @@ main = do
 	args <- getArgs
 	case args of
 		("lookupUserAt":s:u:_) ->do
-			 pwd <- createPasswordsFromFileURL $ home++"/passwords"
+			 pwd <- createPasswordsFromFileURL $ home++"/.passwords"
 			 putStr . pre $ lookupUserAtService u s pwd
 		("lookupService":s:_) ->do 
-			 pwd <- createPasswordsFromFileURL $ home++"/passwords"
+			 pwd <- createPasswordsFromFileURL $ home++"/.passwords"
 			 shower $ lookupService s pwd
 		("showAll":_) -> do
-			 pwd <- createPasswordsFromFileURL $ home++"/passwords"
+			 pwd <- createPasswordsFromFileURL $ home++"/.passwords"
 			 putStr $ presentAccountsInFile pwd
 		("update":s:u:p:_) -> do
-			!pwd <- createPasswordsFromFileURL $ home++"/passwords"
+			!pwd <- createPasswordsFromFileURL $ home++"/.passwords"
 			let nP = update s u p pwd 
 			writeToDisk $ show nP
 		("insert":s:u:p:_) -> do 
-			!pwd <- createPasswordsFromFileURL $ home++"/passwords"
+			!pwd <- createPasswordsFromFileURL $ home++"/.passwords"
 			let nP = insert s u p pwd 
 			writeToDisk $ show nP
 		("remove":s:u:_) -> do 
-			!pwd <- createPasswordsFromFileURL $ home++"/passwords"
+			!pwd <- createPasswordsFromFileURL $ home++"/.passwords"
 			let nP = remove s u pwd 
 			writeToDisk $ show nP
 		("createPassword":_) -> do
 			p <- createStandartPassword
 			putStr $ "The password created for you is: " ++ p ++ "\n"
 		("createUser":s:u:_) -> do
-			!p <- createPasswordsFromFileURL $ home++"/passwords"
+			!p <- createPasswordsFromFileURL $ home++"/.passwords"
 			nP <- createAccountForService s u p
 			writeToDisk $ show nP 
 		_ -> putStrLn $ "Command: lookupUserAt <User> <Service> \n lookupService <Service> \n " ++
@@ -66,13 +66,15 @@ pre (Just s) = presentAccount s
 writeToDisk:: String -> IO ()
 writeToDisk s = do 
 	home <- getHomeDirectory
-	writeFile (home ++ "/passwords") s
+	writeFile (home ++ "/.passwords") s
 
 checkpassWordFile home = do
 	con <- getDirectoryContents home
-	case (elem "passwords" con) of
+	case (elem ".passwords" con) of
 	 True -> return ()
-	 False -> createPasswordsFile home
+	 False -> do 
+		putStrLn "passwords file missing, a new (empty) is created"
+		createPasswordsFile home "/.passwords"
 
 
 
