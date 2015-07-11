@@ -48,8 +48,9 @@ main = do
 			!p <- createPasswordsFromFileURL $ home++"/.passwords"
 			nP <- createAccountForService s u p
 			writeToDisk $ show nP 
+			putStrLn . pre $ lookupUserAtService u s nP
 		_ -> putStrLn $ "Command: lookupUserAt <User> <Service> \n lookupService <Service> \n " ++
-			"update <Service> <User> <Password> \n insert <Service> <User> <Password> \n remove <Service> <User> \n showAll"
+			"update <Service> <User> <Password> \n insert <Service> <User> <Password> \n remove <Service> <User> \n showAll\n createPassword\n createUser <Service> <User>\n"
 
 
 shower:: Maybe [SUP] -> IO ()
