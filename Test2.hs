@@ -16,15 +16,26 @@ data T a where
 	T1 :: Bool -> T Bool
 	T2 :: T a
 
-
+f :: T a -> a -> a
 f x y = case x of
-	T1 z -> True
+	T1 z -> z
 	T2   -> y
 
 
 fac :: (Ord a, Num a) => a -> a
 fac x | x <= 1 = 1
       | otherwise = x * (fac $ x-1)
+
+fib 0 = 0
+fib 1 = 1
+fib 2 = 1
+fib x = fib (x-1) + fib (x-2)
+
+fib2 0 = 0
+fib2 a = fibber a 0 1
+	where 
+		fibber 0 x y = x
+		fibber n x y = fibber (n-1) y (x+y)
 
 grow f x = (f x) : x
 
