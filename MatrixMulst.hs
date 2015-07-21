@@ -11,8 +11,10 @@ module MatrixMulst where
 
 import MatrixRot
 
-multMatrixWithMatrix:: Matrix -> Matrix -> Matrix
-multMatrixWithMatrix m n = createMatrix $ mult j k
+multMatrixWithMatrix:: Matrix -> Matrix -> Maybe Matrix
+multMatrixWithMatrix m n = case checkMatrix m && checkMatrix n of
+	 	True ->	Just . createMatrix $ mult j k
+		False -> Nothing
 	where
 	j = createComputeMatrix m
 	k = createComputeMatrix n

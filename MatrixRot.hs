@@ -5,6 +5,8 @@
 --
 -- Distributed under terms of the MIT license.
 --
+--
+--Functions exspect the input Matrix to be well formatted, checkMatrix return True if that is the case and False if not.
 
 module MatrixRot
 	where
@@ -24,10 +26,25 @@ calcNewPos s ((x,y), v) = ((s-y-1, x), v)
 rotateMatrix:: ComputeMatrix -> ComputeMatrix
 rotateMatrix (ComputeMatrix m s r) = ComputeMatrix (map(calcNewPos s) m)r s 
 
-rotateMatrix90Deg:: Matrix -> Matrix
-rotateMatrix90Deg = createMatrix . rotateMatrix . createComputeMatrix
+--The Matrix is returned unmodified in case it is bad formatted
+rotateMatrix90Deg:: Matrix -> Matrix 
+rotateMatrix90Deg x =case checkMatrix x of 
+	True ->  createMatrix . rotateMatrix $ createComputeMatrix x
+	False -> x
+
+checkMatrix:: Matrix -> Bool
+checkMatrix [[]] = False
+checkMatrix [] 	 = False
+checkMatrix (x:[]) = True
+checkMatrix (x:xs) = check xs $ length x
+	where
+	check [] _ = True
+	check (x:xs) n = length x == n && check xs n
+
 
 createComputeMatrix::Matrix -> ComputeMatrix
+createComputeMatrix []    = ComputeMatrix [] 0 0
+createComputeMatrix [[]] = createComputeMatrix []
 createComputeMatrix (x:xs) = ComputeMatrix z ( length (x:xs)) (length x) 
 	where
 	z = createM (0, 0) (x:xs)
