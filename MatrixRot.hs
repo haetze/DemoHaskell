@@ -22,7 +22,7 @@ calcNewPos:: Int -> Element -> Element
 calcNewPos s ((x,y), v) = ((s-y-1, x), v)
 
 rotateMatrix:: ComputeMatrix -> ComputeMatrix
-rotateMatrix (ComputeMatrix m s r) = ComputeMatrix (map(calcNewPos s) m) s r
+rotateMatrix (ComputeMatrix m s r) = ComputeMatrix (map(calcNewPos s) m)r s 
 
 rotateMatrix90Deg:: Matrix -> Matrix
 rotateMatrix90Deg = createMatrix . rotateMatrix . createComputeMatrix
@@ -39,7 +39,7 @@ createM (x, y) (z:xs) = ((x, y), head z) : createM (x+1, y) (tail z: xs)
 
 
 createRow:: ComputeMatrix -> Int -> [Double]
-createRow (ComputeMatrix x s r) n = row (ComputeMatrix y s r) 0
+createRow (ComputeMatrix x s r) n = row (ComputeMatrix y 1 r) 0
 	where 
 	y = filter (f n) x
 	f n ((_,y),_) = n == y
@@ -47,17 +47,17 @@ createRow (ComputeMatrix x s r) n = row (ComputeMatrix y s r) 0
 
 
 row:: ComputeMatrix -> Int -> [Double]
-row (ComputeMatrix _ s r) n | n >= s = []
+row (ComputeMatrix _ s r) n | n >= r = []
 row cm@(ComputeMatrix m s r) n = find m n : row cm (n+1)
 	
 
 find:: M -> Int -> Double
-find [] 	_ 	= 0
+find [] 	_ 	= 0 
 find (((x,_),a):xs) n | x == n = a
 		| otherwise = find xs n 
 
 createMatrix:: ComputeMatrix -> Matrix
 createMatrix cm@(ComputeMatrix m s r) = rows cm 0
 	where
-	rows _ n | n >= r = []
+	rows _ n | n >= s = []
 	rows m n = createRow m n : rows m (n+1)

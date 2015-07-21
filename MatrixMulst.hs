@@ -23,7 +23,7 @@ computeElementFromRows [] [] = 0
 computeElementFromRows (x:xs) (y:ys) = x*y+computeElementFromRows xs ys
 
 mult:: ComputeMatrix -> ComputeMatrix -> ComputeMatrix
-mult xs@(ComputeMatrix x s r) ys@(ComputeMatrix y s2 r2) | r == s2 && s == r2 = multM xs $ rotateMatrix  ys
+mult xs@(ComputeMatrix x s r) ys@(ComputeMatrix y s2 r2) | r == s2 = multM xs $ rotateMatrix  ys
 		| otherwise = error "Wrong format"
 
 multM:: ComputeMatrix -> ComputeMatrix -> ComputeMatrix
@@ -40,11 +40,6 @@ calcRow:: Row -> Matrix -> Row
 calcRow x (y:[]) = computeElementFromRows x (reverse y) : []
 calcRow x []     = []
 calcRow x (y:ys) = computeElementFromRows x (reverse y) : calcRow x ys
-
-
-
-
- 
 
 
 
