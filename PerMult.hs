@@ -9,99 +9,89 @@
 module PerMult where
 
 
-data El a = El a a Bool
+data El a = El a Bool
 	deriving(Show, Read, Eq)
 
 
 createList::[a]->[El a]
-createList (x:xs) = (El x (head xs) False): c x xs
-	where	
-	c _ [] = []
-	c x (y:[]) = [El y x False]
-	c x (y:ys) = El y (head ys) False : c x ys
+createList [] 	= []
+createList (x:xs) = (El x False): createList xs
 
 getX::El a -> a
-getX (El x _ _) = x
-
-getY:: El a -> a
-getY (El _ y _) = y
+getX (El x _) = x
 
 getBool:: El a -> Bool 
-getBool (El _ _ b) = b
+getBool (El _ b) = b
 
-createMult:: [[a]] -> [El a]
-createMult = concat . map createList
+createMult:: [[a]] -> [[El a]]
+createMult =  map createList
 
 changeStatus::El a -> El a
-changeStatus (El x y b) = El x y (not b)
+changeStatus (El x b) = El x (not b)
 
-swap:: El a -> El a
-swap (El x y b) = El y x b	
-
-
-findStart::[El a] -> El a
-findStart (x:xs) | not $ getBool x = x
-		| otherwise	  = findStart xs
-
-
-
-findNext::Eq a => [El a]->[El a] -> El a -> (El a, [El a], [El a]) 
-findNext [] _ 	x = (x, [],[])
-findNext (x:xs) ys y | getX x == getY y && not (getBool x) = (z, ys2 , xs)
-		  | getX x == getX y && getY y == getY x = (t1, uu, t3)
-		  | otherwise = (t1, t2,t3)
+searchNextElement::Eq a=> [El a] -> El a -> (Maybe (El a), [El a])
+searchNextElement [] _ = (Nothing, [])
+searchNextElement (x:xs) y = s (x:xs) x y
+	where 
+	s::Eq a => [El a] -> El a->El a-> (Maybe (El a), [El a])
+	s (x:[]) v y | getX x == getX y && not (getBool x)= (Just v, x2 :[])
+		     | otherwise = (Nothing, x:[])
+		where
+		x2 = changeStatus x
+	s (x:xs) v y |getX x==getX y&&not(getBool x)=(Just(head xs), x2:xs) 
+			   | otherwise = (j , is)
+		where
+		(j, i) = s xs v y
+		is = x:i
+		x2 = changeStatus x
+		
+findReal::Eq a => [[El a]] -> El a-> (Maybe (El a), [[El a]])
+findReal [] _ = (Nothing, [])
+findReal (x:[]) y = (c, [i])
+	where 
+	(c, i) = searchNextElement x y
+findReal (x:xs) y = case c of
+	Nothing -> (k, l)
+	Just v -> (o, p) 
+		where 
+		(o2, p1) = findReal xs v 
+		o = case o2 of
+			Nothing -> Just  v
+			Just x -> Just  x
+		p = i:p1
+		(c, i) = searchNextElement x y
 	where
-	z = changeStatus x
-	(t1, t2, t3) = findNext xs ys y
-	o = reverse ys
-	p = reverse t2
-	p2 = drop ((length xs)+1) p	
-	o2 = drop ((length xs)+1) o
-	ys2 = reverse $ reverse xs ++ [z] ++ o2
-	uu = reverse $ reverse t3 ++ [t1] ++ [z] ++ p2
+	(c, i) = searchNextElement x y
+	(k, l1) = findReal xs y
+	l = x:l1
 
-findReal::Eq a => [El a] -> [El a] -> El a -> (El a, [El a], [El a])
-findReal xs ys x = case w == x of
-	True -> (x, ys, xs)
-	False -> findReal xs2 ys2 w
+findCycle::Eq a=>[[El a]]->El a-> ([El a], [[El a]])
+findCycle xs y = ff xs y [y]
 	where
-	(e1, e2, e3) = findNext xs ys x
-	(f1,f2,f3) = findNextX e3 e2 e1
-	(w, ys2, xs2) = (f1, f2, f3)
-	
-
-eq::Eq a=> El a -> El a -> Bool
-eq x y = getX x == getX y && getY x == getY y
-
-proc:: Eq a=> [El a] -> El a -> Bool
-proc [] _ = not False
-proc (x:xs) n | getX x == getX n = False
-	      | otherwise = proc xs n 
-
-findNextX::Eq a=> [El a] -> [El a] -> El a-> (El a, [El a],[El a])
-findNextX xs ys x = case d == swap x of
-	True-> (x, ys, xs)
-	False-> (d, m, k)
-	where
-	(d, m, k) = findNext xs ys (swap x)
-
---last = head . reverse
+	ff::Eq a=>[[El a]]->El a->[El a]->([El a], [[El a]])
+	ff xs y ys = do
+		let (x, u) = findReal xs y
+		case x of 
+			Nothing -> (ys, xs)
+			Just v  -> if getX v == getX (head ys) then
+				(ys, xs)
+				else ff u v (ys ++[v])
 
 
 
 
-cycle2::Eq a=> [El a] -> [El a] -> [El a] -> ([El a], [El a], [El a]) 
-cycle2 xs ys cs = case ds == cs of
-	True -> (cs, ys, xs)
-	False -> cycle2 ys2 ys2 ds
-	where
-	(e1, ys2, xs2) = findReal xs ys (last cs)
-	ds = case e1 == last cs of
-		True -> cs
-		False -> cs ++ [e1]
 
-	
- 		
+
+
+
+		
+
+
+
+
+
+
+
 
 
 	
