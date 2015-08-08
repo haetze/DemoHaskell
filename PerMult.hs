@@ -93,7 +93,7 @@ findNextX xs ys x = case d == swap x of
 cycle2::Eq a=> [El a] -> [El a] -> [El a] -> ([El a], [El a], [El a]) 
 cycle2 xs ys cs = case ds == cs of
 	True -> (cs, ys, xs)
-	False -> cycle2 xs2 ys2 ds
+	False -> cycle2 ys2 ys2 ds
 	where
 	(e1, ys2, xs2) = findReal xs ys (last cs)
 	ds = case e1 == last cs of
