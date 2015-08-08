@@ -78,20 +78,15 @@ findCycle xs y = ff xs y [y]
 				else ff u v (ys ++[v])
 
 
+pickNext::[El a] -> Maybe (El a)
+pickNext [] = Nothing
+pickNext (x:xs) | not $ getBool x = Just x
+		| otherwise 	= pickNext xs
 
-
-
-
-
-
-		
-
-
-
-
-
-
-
-
-
+cycle2::Eq a=> [[El a]] -> [[El a]]
+cycle2 (x:xs) = map (dropFirst .findCycle (x:xs)) x
 	
+
+
+dropFirst::(a,b) -> a
+dropFirst (x,y) = x	
