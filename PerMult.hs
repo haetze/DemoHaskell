@@ -7,10 +7,10 @@
 --
 
 module PerMult where
-
+import Data.List
 
 data El a = El a Bool
-	deriving(Show, Read, Eq)
+	deriving(Show, Read, Eq, Ord)
 
 
 createList::[a]->[El a]
@@ -83,10 +83,35 @@ pickNext [] = Nothing
 pickNext (x:xs) | not $ getBool x = Just x
 		| otherwise 	= pickNext xs
 
-cycle2::Eq a=> [[El a]] -> [[El a]]
-cycle2 (x:xs) = map (dropFirst .findCycle (x:xs)) x
+cycle2::(Ord a,Eq a)=> [[El a]] -> [[El a]]
+cycle2 []     = []
+cycle2 (x:xs) = reverse. sort . filterDup  $ map (putSmallestFirst . dropFirst .findCycle (x:xs)) x
 	
 
 
 dropFirst::(a,b) -> a
 dropFirst (x,y) = x	
+
+rot::[a] -> [a]
+rot [] = []
+rot (x:xs) = xs++[x]
+
+rotTil::Eq a => [a] ->  a -> [a]
+rotTil [] _ 	       = []
+rotTil (x:xs) y | x==y = (x:xs)
+		| elem y (x:xs) = rot (x:xs) `rotTil` y
+		| otherwise = error "List does not contain element" 
+
+putSmallestFirst::(Ord a, Eq a) => [a] -> [a]
+putSmallestFirst x = rotTil x . head $ sort x
+
+
+filterDup::(Eq a) => [a] -> [a]
+filterDup [] = []
+filterDup x = f x []
+	where
+	f::Eq a=> [a] -> [a] -> [a]
+	f (x:xs) ys | not $ elem x ys = f xs (ys++[x])
+		    | otherwise       = f xs ys
+	f [] 	 ys 		      = ys
+
