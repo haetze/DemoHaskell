@@ -8,6 +8,8 @@
 
 module PerMult where
 import Data.List
+import Control.Parallel
+import Control.Parallel.Strategies
 
 data El a = El a Bool
 	deriving(Show, Read, Eq, Ord)
@@ -85,7 +87,7 @@ pickNext (x:xs) | not $ getBool x = Just x
 
 cycle2::(Ord a,Eq a)=> [[El a]] -> [[El a]]
 cycle2 []     = []
-cycle2 (x:xs) = reverse. sort . filterDup  $ map (putSmallestFirst . dropFirst .findCycle (x:xs)) x
+cycle2 (x:xs) = reverse. sort . filterDup  $ (map (putSmallestFirst . dropFirst .findCycle (x:xs)) x `using` parList (rparWith rpar))
 	
 
 
