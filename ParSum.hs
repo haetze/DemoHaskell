@@ -28,4 +28,3 @@ dive [] = []
 dive (x:[]) = [[x]]
 dive (x:xs) = [(x:head xs:[]),(tail xs)]
 
-
