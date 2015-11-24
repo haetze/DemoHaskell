@@ -15,6 +15,8 @@ import System.Directory
 import PasswordMan
 import qualified Data.ByteString.Char8 as B
 import Crypto
+import System.Posix.Terminal
+import System.Posix.IO (stdInput)
 
 main:: IO ()
 main = do
@@ -22,7 +24,7 @@ main = do
   checkpassWordFile home
   args <- getArgs
   putStrLn "Enter password:" 
-  password <- getLine
+  password <- getPassword
   case args of
     ("lookupUserAt":s:u:_) ->do
        pwd <- createPasswordsFromFileURL (home++"/.passwords") password
@@ -80,6 +82,15 @@ checkpassWordFile home = do
    False -> do 
     putStrLn "passwords file missing, a new (empty) is created"
     createPasswordsFile home "/.passwords"
+
+
+getPassword:: IO String
+getPassword = do
+  tc <- getTerminalAttributes stdInput
+  setTerminalAttributes stdInput (withoutMode tc EnableEcho) Immediately
+  password <- getLine
+  setTerminalAttributes stdInput tc Immediately
+  return password
 
 
 
