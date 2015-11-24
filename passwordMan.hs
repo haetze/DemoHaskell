@@ -13,41 +13,45 @@ import System.Environment(getArgs)
 import System.IO
 import System.Directory
 import PasswordMan
+import qualified Data.ByteString.Char8 as B
+import Crypto
 
 main:: IO ()
 main = do
   home <- getHomeDirectory
   checkpassWordFile home
   args <- getArgs
+  putStrLn "Enter password:" 
+  password <- getLine
   case args of
     ("lookupUserAt":s:u:_) ->do
-       pwd <- createPasswordsFromFileURL $ home++"/.passwords"
+       pwd <- createPasswordsFromFileURL (home++"/.passwords") password
        putStr . pre $ lookupUserAtService u s pwd
     ("lookupService":s:_) ->do 
-       pwd <- createPasswordsFromFileURL $ home++"/.passwords"
+       pwd <- createPasswordsFromFileURL (home++"/.passwords") password
        shower $ lookupService s pwd
     ("showAll":_) -> do
-       pwd <- createPasswordsFromFileURL $ home++"/.passwords"
+       pwd <- createPasswordsFromFileURL (home++"/.passwords") password
        putStr $ presentAccountsInFile pwd
     ("update":s:u:p:_) -> do
-      !pwd <- createPasswordsFromFileURL $ home++"/.passwords"
+      !pwd <- createPasswordsFromFileURL (home++"/.passwords") password
       let nP = update s u p pwd 
-      writeToDisk $ show nP
+      writeToDisk (show nP) password 
     ("insert":s:u:p:_) -> do 
-      !pwd <- createPasswordsFromFileURL $ home++"/.passwords"
+      !pwd <- createPasswordsFromFileURL (home++"/.passwords") password
       let nP = insert s u p pwd 
-      writeToDisk $ show nP
+      writeToDisk (show nP) password 
     ("remove":s:u:_) -> do 
-      !pwd <- createPasswordsFromFileURL $ home++"/.passwords"
+      !pwd <- createPasswordsFromFileURL (home++"/.passwords") password
       let nP = remove s u pwd 
-      writeToDisk $ show nP
+      writeToDisk (show nP) password 
     ("createPassword":_) -> do
       p <- createStandartPassword
       putStr $ "The password created for you is: " ++ p ++ "\n"
     ("createUser":s:u:_) -> do
-      !p <- createPasswordsFromFileURL $ home++"/.passwords"
+      !p <- createPasswordsFromFileURL (home++"/.passwords") password
       nP <- createAccountForService s u p
-      writeToDisk $ show nP 
+      writeToDisk (show nP) password 
       putStrLn . pre $ lookupUserAtService u s nP
     _ -> putStrLn $ "Command: lookupUserAt <User> <Service> \n lookupService <Service> \n " ++
       "update <Service> <User> <Password> \n insert <Service> <User> <Password> \n remove <Service> <User> \n showAll\n createPassword\n createUser <Service> <User>\n"
@@ -64,10 +68,10 @@ pre:: Maybe SUP -> String
 pre Nothing = "nothing found" 
 pre (Just s) = presentAccount s
 
-writeToDisk:: String -> IO ()
-writeToDisk s = do 
+writeToDisk:: String -> String -> IO ()
+writeToDisk s  p = do 
   home <- getHomeDirectory
-  writeFile (home ++ "/.passwords") s
+  B.writeFile (home ++ "/.passwords") (ciph p s)
 
 checkpassWordFile home = do
   con <- getDirectoryContents home

@@ -11,6 +11,8 @@ module PasswordMan where
 import Data.Maybe
 import System.IO
 import Random
+import qualified Data.ByteString.Char8 as B
+import Crypto
 
 type Username = String
 type PWD = String
@@ -60,10 +62,11 @@ presentAccountsInFile:: Passwords -> String
 presentAccountsInFile (Passwords []) = "\n"
 presentAccountsInFile (Passwords (x:xs)) = presentAccount x ++ presentAccountsInFile (Passwords xs)
 
-createPasswordsFromFileURL:: FileURL -> IO Passwords
-createPasswordsFromFileURL url = do
-  file <- readFile url
-  let pwd = read file
+createPasswordsFromFileURL:: FileURL ->String -> IO Passwords
+createPasswordsFromFileURL url password = do
+  file <- B.readFile url
+  let f = decipher password (B.unpack file)
+  let pwd = read (B.unpack f)
   return pwd
 
 update:: Service -> Username -> PWD -> Passwords -> Passwords
