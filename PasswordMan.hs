@@ -32,10 +32,10 @@ createPasswordWithChar n = do
   cs <- createPasswordWithChar $ n-1
   return (c:cs)
 
-createPasswordsFile:: FilePath -> String -> IO ()
-createPasswordsFile home file= do
+createPasswordsFile:: FilePath -> String -> String -> IO ()
+createPasswordsFile home file key= do
   f <- openFile (home ++ file) WriteMode
-  hPutStr f "Passwords []"
+  B.hPutStr f $ ciph key "Passwords []"
   hClose f
 
 createStandartPassword:: IO PWD

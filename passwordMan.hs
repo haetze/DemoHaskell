@@ -21,10 +21,10 @@ import System.Posix.IO (stdInput)
 main:: IO ()
 main = do
   home <- getHomeDirectory
-  checkpassWordFile home
   args <- getArgs
   putStrLn "Enter password:" 
   password <- getPassword
+  checkpassWordFile home password
   case args of
     ("lookupUserAt":s:u:_) ->do
        pwd <- createPasswordsFromFileURL (home++"/.passwords") password
@@ -75,13 +75,13 @@ writeToDisk s  p = do
   home <- getHomeDirectory
   B.writeFile (home ++ "/.passwords") (ciph p s)
 
-checkpassWordFile home = do
+checkpassWordFile home key = do
   con <- getDirectoryContents home
   case (elem ".passwords" con) of
    True -> return ()
    False -> do 
     putStrLn "passwords file missing, a new (empty) is created"
-    createPasswordsFile home "/.passwords"
+    createPasswordsFile home "/.passwords" key
 
 
 getPassword:: IO String

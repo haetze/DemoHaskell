@@ -20,7 +20,7 @@ createMult16String x | length x `mod` 16 == 0 = x
 
 createKey x = key 
   where 
-  Right key = makeKey . B.pack $ createMult16String x
+  Right key = makeKey . B.pack . take 16 $ createMult16String x
 
 createCipher:: String -> AES128
 createCipher = cipherInit . createKey
