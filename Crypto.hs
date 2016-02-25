@@ -9,7 +9,7 @@
 module Crypto where
 
 import Crypto.Cipher
-import Crypto.Cipher.Types
+--import Crypto.Cipher.Types
 import qualified Data.ByteString.Char8 as B
 
 

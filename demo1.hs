@@ -13,4 +13,6 @@ biggest xs = last $ sort xs
 
 main = do
 	args <- getArgs
-	putStrLn . show $ biggest $ map read args 
+	putStrLn . show $ biggest $ map read args
+        let two = show 1
+      
