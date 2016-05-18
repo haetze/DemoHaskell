@@ -7,6 +7,8 @@
 
 module Sort where
 
+--import Data.List
+
 data Sorted a = Sorted (Sorted a) (Sorted a) (Sorted a) |
                 Single a |
                 None
@@ -52,3 +54,14 @@ insertSorted x (y:ys) | x < y = (x:y:ys)
 mySort [] = []
 mySort (x:[]) = [x]
 mySort (x:y:xs) = insertSorted x $ mySort (y:xs)
+
+
+qsort [] = []
+qsort (x:[]) = [x]
+qsort xs = qsort (filter f xs) ++ qsort (filter (\s -> not (f s)) xs)
+  where
+    f s =  s <= sum xs `div` length xs
+
+
+
+
