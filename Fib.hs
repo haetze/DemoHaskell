@@ -20,6 +20,8 @@ fib (x:xs) n | n < length (x:xs) = (y,(x:xs))
 		s = x + head xs
 
 
+fibs = 1:1: (zipWith (+) fibs $ tail fibs)
+
 get:: [a] -> Int -> Maybe a
 get _ 0 = Nothing
 get [] _ = Nothing

@@ -203,14 +203,14 @@ changeRoomInClient client room = Client{
 	roomName = room}	
 	
 	
-port:: Int
+--port:: Int
 port = 8080
 
 main :: IO()
 main = do
-  sock <- listenOn (PortNumber (fromIntegral port))              
+  sock <- listenOn (PortNumber port)              
   server <- newServer
-  printf "Listening on port %d\n" port
+  --printf "Listening on port %d\n" port
   forever $ do                                                  
      (handle, host, port) <- accept sock                         
      printf "Accepted connection from %s: %s\n" host (show port)
