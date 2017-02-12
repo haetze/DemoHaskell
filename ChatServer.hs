@@ -173,7 +173,7 @@ handleMessagesFromClient client@Client{..} server@Server{..} = do
 		case (words m) of
 		  "/changeRoom":to:[] -> atomically $ do
 			a <- clientInRoomOnServer client server to
-			case a of
+                        case a of
 		  	  False -> do 
 				removeClientFromRoomOnServer client roomName server
 				insertClientInRoomOnServer to server client
