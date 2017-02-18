@@ -1,0 +1,8 @@
+module List where
+
+
+isSuffix::Eq a => [a] -> [a] -> Bool
+isSuffix []     _      = True
+isSuffix (a:as) (b:bs)
+  | a == b             = isSuffix as bs
+  | otherwise          = False 
