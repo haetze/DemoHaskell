@@ -1,0 +1,37 @@
+#+TITLE: List
+#+AUTHOR: Richard Stewing
+#+LATEX_CLASS_OPTIONs: [a4paper]
+#+LATEX_HEADER: \usepackage{ngerman}
+#+LATEX_HEADER: \usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+
+\rhead{\LaTeX 1}
+\lhead{\LaTeX 2}
+\chead{\LaTeX 3}
+
+
+
+* KK
+ccecwewedwewed
+* KK
+dwedwedwedwedwed
+* KK
+dwewedewdwedwd
+* KK
+dwedwedwedwe
+* KK
+wdeewedwedwed
+* KK
+dwedwedew
+* KK
+dwedwedwed
+* KK
+dwedewdwed
+* KK
+dwedwedwed
+* a
+wdewedwed
+* e
+ss
