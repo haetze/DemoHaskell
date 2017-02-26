@@ -1,0 +1,10 @@
+module Chess where
+
+
+data Color = Black | White
+           deriving(Show, Read)
+
+data PieceType = King | Queen | Rook | Knight | Bishop | Pawn
+               deriving(Show, Read)
+
+                       
