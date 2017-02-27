@@ -5,10 +5,10 @@ import Data.List
 import Data.Char
 
 data Color = Black | White
-           deriving(Show, Read)
+           deriving(Show, Read, Eq)
 
 data PieceType = King | Queen | Rook | Knight | Bishop | Pawn
-               deriving(Show, Read)
+               deriving(Show, Read, Eq)
 
 type XPosition = Int 
               
@@ -68,4 +68,89 @@ showBoard = loop 1 1
 toString::Piece -> String
 toString (t, Black) = return $ toLower $ head $ show t
 toString (t, _)     = return $ head $ show t
+
+
+filterInBounds:: [Position] -> [Position]
+filterInBounds = filter f
+  where
+    f (x,y) | x > 0 && x < 9 && y > 0 && y < 9 = True
+            | otherwise                        = False  
  
+possibleMoves:: Position -> Piece -> [Position]
+
+possibleMoves (x,2) (Pawn,Black) = filterInBounds [(x,3),(x,4),(x+1,3),(x-1,3)]
+possibleMoves (x,y) (Pawn,Black) = filterInBounds [(x,y+1),(x+1,y+1),(x-1,y+1)]
+
+possibleMoves (x,7) (Pawn,White) = filterInBounds [(x,6),(x,5),(x+1,6),(x-1,6)]
+possibleMoves (x,y) (Pawn,White) = filterInBounds [(x,y-1),(x+1,y-1),(x-1,y-1)]
+
+possibleMoves (x,y) (Rook,_)     = filterInBounds [(x',y') | x' <- [1..8], y' <- [1..8] , x == x' || y == y']
+
+possibleMoves (x,y) (Bishop,_)   = filterInBounds $
+  [(x-n,y-n)| n <- [1..8]] ++
+  [(x-n,y+n)| n <- [1..8]] ++
+  [(x+n,y-n)| n <- [1..8]] ++
+  [(x+n,y+n) | n <- [1..8]]
+
+possibleMoves (x,y) (Knight,_) = filterInBounds $ [(x+2,y+1)
+                                                  ,(x+2,y-1)
+                                                  ,(x-2,y+1)
+                                                  ,(x-2,y-1)
+                                                  ,(x+1,y+2)
+                                                  ,(x-1,y+2)
+                                                  ,(x+1,y-2)
+                                                  ,(x-1,y-2)]
+  
+possibleMoves (x,y) (Queen,_) = possibleMoves (x,y) (Rook,Black) ++ possibleMoves (x,y) (Bishop, Black)
+
+possibleMoves (x,y) (King,_)  = filterInBounds $ [(x+1,y+1)
+                                                 ,(x+1,y-1)
+                                                 ,(x-1,y-1)
+                                                 ,(x-1,y+1)
+                                                 ,(x+1,y)
+                                                 ,(x-1,y)
+                                                 ,(x,y+1)
+                                                 ,(x,y-1)]
+
+
+possibleOnBoard:: Position -> Piece -> Map.Map Position Piece -> [Position]
+possibleOnBoard pos p@(piece, color) b = filter (pathwise pos b) [p' | p' <- possibleMoves pos p
+                                              ,check pos p' p b]
+
+check:: Position -> Position -> Piece -> Map.Map Position Piece -> Bool
+check _ _  (Knight,_) b = True
+
+check (x,y) (x',y') (Pawn, c)   b | x /= x' = case Map.lookup (x',y') b of
+                                      Nothing -> False
+                                      Just (piece, color) -> color /= c
+                                  | otherwise = and [Map.lookup pos b == Nothing
+                                                     || f (Map.lookup pos b) c | pos <- findPath (x,y) (x',y') ]
+  where
+    f (Just (_, color)) c = c /= color
+
+check p p' (_, color)   b = and [f (Map.lookup pos b) color | pos <- findPath p p']
+  where
+    f Nothing           _ = True
+    f (Just (_, color)) c = c /= color
+
+
+findPath:: Position -> Position -> [Position]
+findPath p p' | p == p'                    = []
+findPath (x,y) (x',y') | y' == y && x < x' = (x',y') : findPath (x,y) (x'-1,y')
+                       | y' == y && x > x' = (x',y') : findPath (x,y) (x'+1,y')
+                       | x' == x && y < y' = (x',y') : findPath (x,y) (x',y'-1)
+                       | x' == x && y > y' = (x',y') : findPath (x,y) (x',y'+1)
+                       | x < x'  && y < y' = (x',y') : findPath (x,y) (x'-1,y'-1)
+                       | x > x'  && y > y' = (x',y') : findPath (x,y) (x'+1,y'+1)
+                       | x > x'  && y < y' = (x',y') : findPath (x,y) (x'+1,y'-1)
+                       | x < x'  && y > y' = (x',y') : findPath (x,y) (x'-1,y'+1)
+
+remove x = filter (\y -> y /= x)
+
+pathwise:: Position -> Map.Map Position Piece -> Position -> Bool
+pathwise p b p' = and [Map.lookup pos b == Nothing | pos <- remove p' $ remove p $ findPath p p']
+
+
+testBoard::Map.Map Position Piece
+testBoard = Map.fromList $ [((2,2),(Pawn, White))
+                            ,((3,3),(Pawn,White))]
