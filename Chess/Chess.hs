@@ -58,7 +58,8 @@ startingBoard = Map.fromList $ [((1, 1), (Rook,   Black))
 showBoard:: Map.Map Position Piece -> IO ()
 showBoard = loop 1 1
   where
-    loop _ 9 _ = do putStrLn "|"
+    loop _ 9 _ = do putStrLn ""
+    loop 9 8 b = do putStrLn ""
     loop 9 y b = do putStrLn "|"; loop 1 (y+1) b
     loop x y b = do case Map.lookup (x,y) b of
                       Nothing -> do putStr "|_"; loop (x+1) y b
@@ -153,4 +154,11 @@ pathwise p b p' = and [Map.lookup pos b == Nothing | pos <- remove p' $ remove p
 
 testBoard::Map.Map Position Piece
 testBoard = Map.fromList $ [((2,2),(Pawn, White))
+                            ,((1,1),(Bishop, Black))
                             ,((3,3),(Pawn,White))]
+
+makeFirstMove:: Position -> Piece -> Map.Map Position Piece -> Map.Map Position Piece
+makeFirstMove pos piece b = Map.insert p piece  b'
+  where
+    p  = head $ possibleOnBoard pos piece b
+    b' = Map.delete pos b
