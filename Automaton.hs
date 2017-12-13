@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, AllowAmbiguousTypes#-}
+{-# LANGUAGE MultiParamTypeClasses#-}
 
 module Automaton where
 
@@ -39,22 +39,42 @@ instance DFA Automaton Count Char Bool where
   betaDFA (Automaton    _   _  b)     = b
 
 class NFA automaton state sigma lambda  where
-  delta         :: automaton state sigma lambda      -> sigma   -> [automaton state sigma lambda]
-  beta          :: automaton state sigma lambda                 -> lambda
-  startingState :: automaton state sigma lambda
-  unfold        :: automaton state sigma lambda      -> [sigma] -> [lambda]
-  unfold a []     = [beta a]
-  unfold a (x:xs) = concatMap (flip unfold xs) (delta a x) 
+  deltaNFA         :: automaton state sigma lambda      -> sigma   -> [automaton state sigma lambda]
+  betaNFA          :: automaton state sigma lambda                 -> lambda
+  startingStateNFA :: automaton state sigma lambda
+  unfoldNFA        :: automaton state sigma lambda      -> [sigma] -> [lambda]
+  unfoldNFA a []     = [betaNFA a]
+  unfoldNFA a (x:xs) = concatMap (flip unfoldNFA xs) (deltaNFA a x) 
 
 
 
 instance NFA Automaton State Int Bool where
-  startingState = Automaton Esum [] True
-  delta (Automaton Esum xs _) x
+  startingStateNFA = Automaton Esum [] True
+  deltaNFA (Automaton Esum xs _) x
     | even x = [Automaton Esum (x:xs) True ]
     | odd  x = [Automaton Osum (x:xs) False]
-  delta (Automaton Osum xs _) x
+  deltaNFA (Automaton Osum xs _) x
     | even x = [Automaton Osum (x:xs) False]
     | odd  x = [Automaton Esum (x:xs) True ]
-  beta (Automaton _ _ y) = y
+  betaNFA (Automaton _ _ y) = y
     
+class EpsilonNFA automaton state sigma lambda  where
+  delta         :: automaton state sigma lambda      -> sigma   -> [automaton state sigma lambda]
+  deltaEpsilon  :: automaton state sigma lambda      -> [automaton state sigma lambda]
+  beta          :: automaton state sigma lambda                 -> lambda
+  startingState :: automaton state sigma lambda
+  unfold        :: automaton state sigma lambda      -> [sigma] -> [lambda]
+  unfold a []     = [beta a]
+  unfold a (x:xs) = concatMap (flip unfold xs) $ delta a x ++ deltaEpsilon a 
+
+
+instance EpsilonNFA Automaton State Int Bool where
+  startingState = Automaton Esum [] True
+  delta (Automaton Esum xs _) x
+    | even x             = [Automaton Esum (x:xs) True ]
+    | odd  x             = [Automaton Osum (x:xs) False]
+  delta (Automaton Osum xs _) x
+    | even x             = [Automaton Osum (x:xs) False]
+    | odd  x             = [Automaton Esum (x:xs) True ]
+  deltaEpsilon _         = []
+  beta (Automaton _ _ y) = y
