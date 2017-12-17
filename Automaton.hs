@@ -30,21 +30,52 @@ esumAutomaton = DFA { currentStateDFA = Esum, deltaDFA = f, betaDFA = True}
          | True   = DFA { currentStateDFA = Osum, deltaDFA = f', betaDFA = False}
 
 
-data EpsilonNFA q sigma lambda = EpsilonNFA { currentStateENFA:: q
-                                            , epsilonDeltaENFA::          [EpsilonNFA q sigma lambda]
-                                            , deltaENFA       :: sigma -> [EpsilonNFA q sigma lambda]
-                                            , betaENFA        :: lambda
-                                            }
+data EpsilonNFAState q sigma lambda = EpsilonNFAState { currentStateENFA:: q
+                                                      , epsilonDeltaENFA::          [EpsilonNFAState q sigma lambda]
+                                                      , deltaENFA       :: sigma -> [EpsilonNFAState q sigma lambda]
+                                                      , betaENFA        :: lambda
+                                                      }
 
 
-unfoldEpsilonNFA:: EpsilonNFA q sigma lambda -> [sigma] -> [lambda]
+unfoldEpsilonNFA:: EpsilonNFAState q sigma lambda -> [sigma] -> [lambda]
 unfoldEpsilonNFA automaton []     = [betaENFA automaton]
 unfoldEpsilonNFA automaton (x:xs) =  concatMap (flip unfoldEpsilonNFA (x:xs)) (epsilonDeltaENFA automaton)
                                   ++ concatMap (flip unfoldEpsilonNFA xs) (deltaENFA automaton x)
 
-esumAutomaton' = EpsilonNFA { currentStateENFA = Esum, deltaENFA = f, betaENFA = True, epsilonDeltaENFA = []}
+esumAutomaton' = EpsilonNFAState { currentStateENFA = Esum, deltaENFA = f, betaENFA = True, epsilonDeltaENFA = []}
   where
     f  x | even x = [esumAutomaton']
-         | True   = [EpsilonNFA { currentStateENFA = Osum, deltaENFA = f', betaENFA = False, epsilonDeltaENFA = []}]
+         | True   = [EpsilonNFAState { currentStateENFA = Osum, deltaENFA = f', betaENFA = False, epsilonDeltaENFA = []}]
     f' x | odd  x = [esumAutomaton']
-         | True   = [EpsilonNFA { currentStateENFA = Osum, deltaENFA = f', betaENFA = False, epsilonDeltaENFA = []}]
+         | True   = [EpsilonNFAState { currentStateENFA = Osum, deltaENFA = f', betaENFA = False, epsilonDeltaENFA = []}]
+
+
+start = EpsilonNFAState {currentStateENFA = ZeroA, deltaENFA = f, betaENFA = True , epsilonDeltaENFA = [a0Automaton, a0Automaton']}
+  where
+    f _ = []
+
+a0Automaton' = EpsilonNFAState {currentStateENFA = ZeroA, deltaENFA = f, betaENFA = True , epsilonDeltaENFA = []}
+  where
+    f 'a' = a1Automaton' : []
+    f  _  = a0Automaton' : []
+
+a1Automaton' = EpsilonNFAState {currentStateENFA = OneA,  deltaENFA = f, betaENFA = False , epsilonDeltaENFA = []}
+  where
+    f 'a' = a0Automaton' : []
+    f  _  = a1Automaton' : []
+
+
+a0Automaton = EpsilonNFAState {currentStateENFA = ZeroA, deltaENFA = f, betaENFA = True , epsilonDeltaENFA = []}
+  where
+    f 'a' = a1Automaton : []
+    f  _  = a0Automaton : []
+ 
+a1Automaton = EpsilonNFAState {currentStateENFA = OneA,  deltaENFA = f, betaENFA = False, epsilonDeltaENFA = []}
+  where
+    f 'a' = a2Automaton : []
+    f  _  = a1Automaton : []
+
+a2Automaton = EpsilonNFAState {currentStateENFA = TwoA,  deltaENFA = f, betaENFA = False, epsilonDeltaENFA = []}
+  where
+    f 'a' = a0Automaton : []
+    f  _  = a2Automaton : []
