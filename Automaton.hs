@@ -9,25 +9,23 @@ data Count = ZeroA | OneA | TwoA
   deriving(Show, Read, Eq, Enum)
 
 
-data DFA q sigma lambda = DFA { currentStateDFA:: q
-                              , deltaDFA       :: sigma -> (DFA q sigma lambda)
-                              , betaDFA        :: lambda
-                              }
+data DFAState q sigma lambda = DFAState { currentStateDFA:: q
+                                   , deltaDFA       :: sigma -> (DFAState q sigma lambda)
+                                   , betaDFA        :: lambda
+                                   }
 
 
-unfoldDFA:: DFA q sigma lambda -> [sigma] -> lambda
-unfoldDFA automaton [] = betaDFA automaton
-unfoldDFA automaton (x:xs) = unfoldDFA (deltaDFA automaton x) xs
+unfoldDFAState:: DFAState q sigma lambda -> [sigma] -> lambda
+unfoldDFAState automaton [] = betaDFA automaton
+unfoldDFAState automaton (x:xs) = unfoldDFAState (deltaDFA automaton x) xs
 
 
-
-
-esumAutomaton = DFA { currentStateDFA = Esum, deltaDFA = f, betaDFA = True}
+esumAutomaton = DFAState { currentStateDFA = Esum, deltaDFA = f, betaDFA = True}
   where
     f  x | even x = esumAutomaton
-         | True   = DFA { currentStateDFA = Osum, deltaDFA = f', betaDFA = False}
+         | True   = DFAState { currentStateDFA = Osum, deltaDFA = f', betaDFA = False}
     f' x | odd  x = esumAutomaton
-         | True   = DFA { currentStateDFA = Osum, deltaDFA = f', betaDFA = False}
+         | True   = DFAState { currentStateDFA = Osum, deltaDFA = f', betaDFA = False}
 
 
 data EpsilonNFAState q sigma lambda = EpsilonNFAState { currentStateENFA:: q
@@ -79,3 +77,6 @@ a2Automaton = EpsilonNFAState {currentStateENFA = TwoA,  deltaENFA = f, betaENFA
   where
     f 'a' = a0Automaton : []
     f  _  = a2Automaton : []
+
+
+
