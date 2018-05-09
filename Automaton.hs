@@ -15,9 +15,11 @@ data DFA q sigma lambda = DFA { currentStateDFA:: q
                               }
 
 
+
 unfoldDFA:: DFA q sigma lambda -> [sigma] -> lambda
 unfoldDFA automaton [] = betaDFA automaton
 unfoldDFA automaton (x:xs) = unfoldDFA (deltaDFA automaton x) xs
+
 
 
 
