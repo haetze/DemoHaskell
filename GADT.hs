@@ -14,21 +14,20 @@ import GHC.TypeLits
 
 data Vec a :: Nat -> * where
   Nil  :: Vec a 0
-  Cons :: a -> Vec a n -> Vec a (n :+ 1)
+  Cons :: a -> Vec a n -> Vec a (n + 1)
 
-data Limit :: Nat -> * where
-  LimitZero :: forall (n::Nat) . Limit (n :+ 1)
-  LimitN    :: forall (n::Nat) . Limit n -> Limit (n :+ 1)
+-- data Limit :: Nat -> * where
+--   LimitZero :: forall (n::Nat) . Limit (n :+ 1)
+--   LimitN    :: forall (n::Nat) . Limit n -> Limit (n :+ 1)
 
 
-hd :: forall a (n::Nat) . Vec a (n :+ 1) -> a
+  
+hd :: forall a (n::Nat) . Vec a (n + 1) -> a
 hd (Cons h _) = h
 
-tl :: forall a (n::Nat) . Vec a (n :+ 1) -> Vec a n
-tl (Cons _ t) = t
 
 
-isNil:: forall a (n::Nat) . Vec a n -> Bool
+isNil:: Vec a n -> Bool
 isNil Nil = True
 isNil  _  = False
 
@@ -58,9 +57,5 @@ append (Cons x xs) ys = Cons x $ append xs ys
 len :: forall a (n::Nat) . Vec a n -> Int
 len Nil = 0
 len (Cons _ t) = 1 + len t
-
-(!!!):: forall a (n::Nat) . Limit n -> Vec a n -> a
-(!!!) LimitZero (Cons h _) = h
-(!!!) (LimitN n) (Cons _ t) = undefined
 
 
