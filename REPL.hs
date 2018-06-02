@@ -2,6 +2,10 @@ module REPL where
 
 import Text.Read(readMaybe)
 import Data.Char
+import System.IO(getLine
+                ,putStrLn
+                ,putStr
+                )
 
 data Operator = Plus
               | Mult
@@ -9,7 +13,7 @@ data Operator = Plus
               | Div deriving(Eq, Read)
 
 data OptTree = Op Operator OptTree OptTree
-             | Number Int deriving(Eq, Read)
+             | Number Double deriving(Eq, Read)
 
 
 readChar:: Char -> String -> Maybe (Char, String)
@@ -17,20 +21,23 @@ readChar c (c':cs) | c == c' = Just (c, cs)
                   | True    = Nothing
 
 readOperator:: String -> Maybe (Operator, String)
-readOperator (c:cs) | c == '+' = Just (Plus, cs) 
-                    | c == '*' = Just (Mult, cs) 
-                    | c == '-' = Just (Sub,  cs) 
-                    | c == '/' = Just (Div,  cs)
-                    | True     = Nothing
+readOperator (c:cs) | c == '+'  = Just (Plus, cs) 
+                    | c == '*'  = Just (Mult, cs) 
+                    | c == '-'  = Just (Sub,  cs) 
+                    | c == '/'  = Just (Div,  cs)
+                    | isSpace c = readOperator cs 
+                    | True      = Nothing
 
 readNumber:: String -> Maybe (OptTree, String)
 readNumber s = do
   n <- readMaybe n
   return (Number n, s')
   where
-    n  = takeWhile isDigit s
-    s' = dropWhile isDigit s
-  
+    n  = takeWhile check s
+    s' = dropWhile check s
+    or fs x = foldl (\b f -> b || f x) False fs
+    check = (or [(=='.') , isSpace, isDigit])
+
 readWord:: String -> String -> Maybe (String, String)
 readWord word string = if word == w then Just (w, s) else Nothing
   where
@@ -53,17 +60,17 @@ readExp s = do
               else do (m, s)  <- readExp s
                       return (Op op n m, s)
 
-readAndEval:: String -> Maybe (Int, String)
+readAndEval:: String -> Maybe (Double, String)
 readAndEval s = do
   (t, s) <- readExp s
   return (eval t, s)
 
-eval:: OptTree -> Int
+eval:: OptTree -> Double
 eval (Number n) = n
-eval (Op Plus n m) = eval n +     eval m
-eval (Op Mult n m) = eval n *     eval m
-eval (Op Div n m)  = eval n `div` eval m
-eval (Op Sub n m)  = eval n -     eval m
+eval (Op Plus n m) = eval n + eval m
+eval (Op Mult n m) = eval n * eval m
+eval (Op Div n m)  = eval n / eval m
+eval (Op Sub n m)  = eval n - eval m
 
   
 instance Show OptTree where
@@ -72,3 +79,12 @@ instance Show OptTree where
   show (Op Mult n m) = show n ++ "*" ++ show m
   show (Op Sub n m)  = show n ++ "-" ++ show m
   show (Op Div n m)  = show n ++ "/" ++ show m
+
+repl:: IO ()
+repl = do
+  putStr ">> "
+  s <- getLine 
+  () <- case readAndEval s of
+    Nothing -> putStrLn ">>> error"
+    Just (n, s) -> putStrLn $ ">>> " ++ show n
+  repl
