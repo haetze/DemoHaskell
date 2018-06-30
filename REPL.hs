@@ -18,7 +18,7 @@ data OptTree = Op Operator OptTree OptTree
 
 readChar:: Char -> String -> Maybe (Char, String)
 readChar c (c':cs) | c == c' = Just (c, cs)
-                  | True    = Nothing
+                   | True    = Nothing
 
 readOperator:: String -> Maybe (Operator, String)
 readOperator (c:cs) | c == '+'  = Just (Plus, cs) 
