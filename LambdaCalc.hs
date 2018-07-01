@@ -2,10 +2,15 @@
 -- LambdaCalc.hs
 -- Simple LambdaCalc
 
+
+
 module LambdaCalc where
 
 import Control.Monad
 
+
+-- Begin untyped arithmetric term
+-- Losely based on "Types and Programming Languages" by Benjamin C. Pierce
 {-
 t := true
      false
