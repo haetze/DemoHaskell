@@ -53,7 +53,17 @@ simpleAlg = TAlg { true = True
                  , pred' = \n -> n-1
                  , isZero = (==0)
                  }
-            
+lispAlg:: TAlg String String
+lispAlg = TAlg { true   = "t"
+                 , false  = "nil"
+                 , ite    = \b n n' -> Num $ "(if (" ++ b ++ ") (" ++ f n ++ ") (" ++ f n ++"))" 
+                 , zero   = "0"
+                 , succ'  = \n -> show $ (read n :: Int)+1
+                 , pred'  = \n -> show $ (read n :: Int)-1
+                 , isZero = \n ->"(" ++ n ++ "==0)"
+                 } where f (Bool b) = b
+                         f (Num  n) = n
+
 
 readTrue:: String -> Maybe (T, String)
 readTrue string = case words string of
@@ -145,19 +155,22 @@ foldN:: TAlg bool num -> T -> num
 foldN alg t = e where Num e = fold alg t
 
 
-readAndEvalSimple:: String -> Maybe (Result Bool Int)
-readAndEvalSimple s = do
+readAndEvalAlg:: TAlg bool num -> String -> Maybe (Result bool num)
+readAndEvalAlg alg s = do
   (t,_) <- readTerm s
-  return $ fold simpleAlg t
+  return $ fold alg t
+
+readAndEvalSimple = readAndEvalAlg simpleAlg
+
   
-repl:: IO ()
-repl = do
+repl:: (Show bool, Show num) => TAlg bool num ->  IO ()
+repl alg = do
   putStr "<<< "
   s <- getLine
-  case readAndEvalSimple s of
-    Nothing -> do putStrLn "Malformed term"; repl
-    Just (Bool b) -> do putStrLn $ ">>> " ++ show b; repl 
-    Just (Num n) -> do putStrLn $ ">>> " ++ show n; repl
+  case readAndEvalAlg alg s of
+    Nothing -> do putStrLn "Malformed term"; repl alg 
+    Just (Bool b) -> do putStrLn $ ">>> " ++ show b; repl alg  
+    Just (Num n) -> do putStrLn $ ">>> " ++ show n; repl alg
     
 
 
