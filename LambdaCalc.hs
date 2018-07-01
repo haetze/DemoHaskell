@@ -11,6 +11,7 @@ import Control.Monad
 
 -- Begin untyped arithmetric term
 -- Losely based on "Types and Programming Languages" by Benjamin C. Pierce
+
 {-
 t := true
      false
@@ -31,13 +32,13 @@ data T = TermTrue
        | IsZero T deriving(Show)
 
 data TAlg bool num = TAlg { true :: bool
-              , false :: bool
-              , ite :: bool -> Result bool num -> Result bool num -> Result bool num
-              , zero :: num
-              , succ' :: num -> num
-              , pred' :: num -> num
-              , isZero :: num -> bool
-              }
+                          , false :: bool
+                          , ite :: bool -> Result bool num -> Result bool num -> Result bool num
+                          , zero :: num
+                          , succ' :: num -> num
+                          , pred' :: num -> num
+                          , isZero :: num -> bool
+                          }
 
 data Result bool num = Num num
                      | Bool bool deriving(Show)
