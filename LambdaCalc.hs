@@ -144,7 +144,15 @@ readAndEvalSimple s = do
   (t,_) <- readTerm s
   return $ fold simpleAlg t
   
-
+repl:: IO ()
+repl = do
+  putStr "<<< "
+  s <- getLine
+  case readAndEvalSimple s of
+    Nothing -> do putStrLn "Malformed term"; repl
+    Just (Bool b) -> do putStrLn $ ">>> " ++ show b; repl 
+    Just (Num n) -> do putStrLn $ ">>> " ++ show n; repl
+    
 
 
 
