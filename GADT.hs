@@ -5,31 +5,18 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
-
+{-# LANGUAGE StandaloneDeriving #-}
 module GADT where
 
-import GHC.Types
-import GHC.TypeLits
+import Prelude hiding (tail, head)
 
+data Nat = Z | S Nat
 
 data Vec a :: Nat -> * where
-  Nil  :: Vec a 0
-  Cons :: a -> Vec a n -> Vec a (n + 1)
+  Nil  :: Vec a Z
+  Cons :: a -> Vec a n -> Vec a (S n)
 
+deriving instance (Show a) => Show (Vec a n)
   
-hd :: forall a (n::Nat) . Vec a (n + 1) -> a
-hd (Cons h _) = h
-
--- ? Why doesnt this work?
--- tl :: forall a (n::Nat) . Vec a (n + 1) -> Vec a n
--- tl (Cons _ t) = t
-
-
-isNil:: Vec a n -> Bool
-isNil Nil = True
-isNil  _  = False
-
--- eq:: forall a (n::Nat). Vec a n -> Vec a n -> Bool
--- eq (Cons h t) (Cons h' t') = h == h' && t `eq` t'
--- eq Nil        Nil          = True
-
+tail:: Vec a (S n) -> Vec a n
+tail (Cons _ t) = t
