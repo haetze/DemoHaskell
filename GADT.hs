@@ -20,3 +20,7 @@ deriving instance (Show a) => Show (Vec a n)
   
 tail:: Vec a (S n) -> Vec a n
 tail (Cons _ t) = t
+
+
+-- f:: * -> Int
+-- f _ = undefined
