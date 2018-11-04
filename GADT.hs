@@ -30,7 +30,12 @@ data Vec a :: Nat -> * where
 
 deriving instance (Show a) => Show (Vec a n)
 
-  
+data N :: Nat -> * where
+  NZ :: N Z
+  NS :: N n -> N (S n)
+
+deriving instance Show (N n)
+
 tail:: Vec a (S n) -> Vec a n
 tail (Cons _ t) = t
 
@@ -41,9 +46,9 @@ append:: Vec a n -> Vec a m -> Vec a (n :+ m)
 append Nil u = u
 append (Cons a v) u = Cons a $ append v u
 
--- repeate:: a -> n -> Vec a n
--- repeate _ Z = Nil
--- repeate a (S n) = Cons a (repeaze a n)
+repeate:: a -> N n -> Vec a n
+repeate _ NZ = Nil
+repeate a (NS n) = Cons a (repeate a n)
 
 
 
