@@ -50,5 +50,6 @@ repeate:: a -> N n -> Vec a n
 repeate _ NZ = Nil
 repeate a (NS n) = Cons a (repeate a n)
 
+  
 
 
