@@ -1,0 +1,7 @@
+#+begin_src haskell :tangle yes 
+f x = x 1
+f (+1)
+#+end_src
+
+#+RESULTS:
+: 2
