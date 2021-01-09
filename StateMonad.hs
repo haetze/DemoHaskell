@@ -58,10 +58,10 @@ instance Applicative (S a) where
   (S f) <*> (S g) = S h
     where
       h a = let (f', a') = f a
-                (b, a'') = g a
+                (b, a'') = g a'
             in (f' b, a'')
 
-instance Monoid a => Monad (S a) where
+instance Monad (S a) where
   -- return :: b -> S a b
   return x = S $ \a -> (x, a)
   -- (>>=) :: S a b -> (b -> S a c) -> S a c
