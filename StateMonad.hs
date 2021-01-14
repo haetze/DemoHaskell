@@ -23,6 +23,20 @@ instance Monad (R a) where
   -- (>>=) :: R a b -> (b -> R a c) -> R a c
   (R f) >>= g = R h where h a = let (R h') = g (f a) in h' a 
 
+-- Example for using Reader
+
+fib 0 = 1
+fib n = n * fib (n-1)
+
+-- fibsum uses the Reader Monad
+-- We don't need to repeat the argument for the calls to fib.
+-- Basically we get a constant argument to all functions
+fibsum :: (Eq a, Num a) => a -> a
+fibsum = do
+  a <- fib
+  b <- fib
+  return $ a + b
+
 
 -- Writer-Monad
 newtype W a b = W (a, b)
@@ -43,6 +57,14 @@ instance Monoid a => Monad (W a) where
   -- (>>=) :: W a b -> (b -> W a c) -> W a c
   (W (a, b)) >>= f = let W (a', c) = f b in W (a `mappend` a', c)
 
+fibMemInput 0 = ([0], 1)
+fibMemInput n = let (_, x) = fibMemInput (n-1) in ([n], n*x)
+
+
+fibinputs a b = do
+  x <- fibMemInput a
+  y <- fibMemInput b
+  return $ x + y
 
 -- Reader + Writer = State-Monad
 newtype S a b = S (a -> (b, a))
@@ -71,3 +93,15 @@ instance Monad (S a) where
                 S g' = g b in g' a'
 
 
+fibWithDec 0 = (1, 0)
+fibWithDec n = let (x, _) = fibWithDec (n-1) in (x*n, n-1)
+
+fibWithDecTwice :: (Eq b, Num b) => S b b
+fibWithDecTwice = do
+  a <- S fibWithDec
+  b <- S fibWithDec
+  return $ a + b
+
+
+runS :: S a b -> a -> (b, a)
+runS (S f) a = f a
